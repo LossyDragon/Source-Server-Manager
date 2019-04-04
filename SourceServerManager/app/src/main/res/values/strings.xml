@@ -12,16 +12,6 @@
     <string name="prompt_password">RCON Password</string>
     <string name="action_add_server">Add Server</string>
     <string name="action_add_server_short">Add</string>
-    <string name="title_edit_server">Edit Server</string>
-    <string name="action_save_changes">Save Changes</string>
-    <string name="action_save_changes_short">Save</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
 
     <!-- Strings related to RCON Activity -->
     <string name="title_activity_server_rcon">ServerRconActivity</string>
@@ -38,11 +28,12 @@
     <string name="emptyRcon">RCON response empty (sent successfully).\n</string>
     <string name="badRcon">Incorrect RCON password.\n</string>
     <string name="socketTimeout">Connection timed out.\n</string>
-    <string name="noServerMsg">It appears that you do not currently have any servers to choose from, please add your server details by selecting \"Add Server\" from the menu.</string>
     <string name="noIP">No IP has been specified. Did you select a server?\n</string>
     <string name="noPort">No port has been specified. Check your settings.\n</string>
 
     <!-- Settings -->
-    <string name="title_settings">Settings</string>
     <string name="pref_title_rcon_timeout">RCON Timeout</string>
+    <string name="button_update">Update Server</string>
+    <string name="title_update">Edit Server</string>
+    <string name="title_add">Add Server</string>
 </resources>
