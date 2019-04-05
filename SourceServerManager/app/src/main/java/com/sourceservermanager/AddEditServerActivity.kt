@@ -3,7 +3,8 @@ package com.sourceservermanager
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_add_server.*
 
@@ -35,12 +36,45 @@ class AddEditServerActivity : AppCompatActivity() {
         }
 
         add_server_button.setOnClickListener { saveNote() }
+
+        show_password.setOnCheckedChangeListener { _, isChecked ->
+            if (!isChecked) {
+                password.transformationMethod = PasswordTransformationMethod.getInstance()
+                password.setSelection(password.text!!.length)
+
+            } else {
+                password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                password.setSelection(password.text!!.length)
+            }
+        }
     }
 
     private fun saveNote() {
 
-        if (address.text.toString().trim().isBlank() || port.text.toString().trim().isBlank()) {
-            Toast.makeText(this, "Can not insert empty server!", Toast.LENGTH_SHORT).show()
+        val serverAddress: String = address.text.toString()
+        val serverPort: String = port.text.toString()
+
+        address.error = null
+        port.error = null
+
+        //Check if address is empty.
+        if (serverAddress.trim().isBlank()) {
+            address.error = "Cannot be empty to save"
+            address.requestFocus()
+            return
+        }
+
+        //Check if port is empty
+        if (serverPort.trim().isBlank()) {
+            port.error = "Cannot be empty to save"
+            port.requestFocus()
+            return
+        }
+
+        //Check if port is valid
+        if (serverPort.toInt() !in 1..65535) {
+            port.error = "Not a valid port"
+            port.requestFocus()
             return
         }
 

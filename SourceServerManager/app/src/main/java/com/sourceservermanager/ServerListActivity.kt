@@ -4,6 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Canvas
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -16,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.sourceservermanager.data.Server
 import kotlinx.android.synthetic.main.activity_server_list.*
 
@@ -29,6 +33,8 @@ class ServerListActivity : AppCompatActivity() {
     }
 
     private lateinit var serverViewModel: ServerViewModel
+    private var recentlyDeletedItem: Server? = null
+    private lateinit var adapter: ServerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,16 +53,20 @@ class ServerListActivity : AppCompatActivity() {
         recycler_view.layoutManager = LinearLayoutManager(this@ServerListActivity)
         recycler_view.setHasFixedSize(true)
 
-        val adapter = ServerAdapter()
+        adapter = ServerAdapter()
         recycler_view.adapter = adapter
 
         serverViewModel = ViewModelProviders.of(this@ServerListActivity).get(ServerViewModel::class.java)
 
-        serverViewModel.getAllServers().observe(this@ServerListActivity, Observer<List<Server>>{
+        serverViewModel.getAllServers().observe(this@ServerListActivity, Observer<List<Server>> {
             adapter.submitList(it)
         })
 
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)) {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+            private val icon: Drawable = resources.getDrawable(R.drawable.ic_delete, null)
+            private val background: ColorDrawable = ColorDrawable(resources.getColor(R.color.colorAccent, null))
+
             override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
@@ -65,10 +75,44 @@ class ServerListActivity : AppCompatActivity() {
                 return false
             }
 
+            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+                val itemView = viewHolder.itemView
+                val backgroundCornerOffset = 20
+
+                val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
+                val iconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
+                val iconBottom = iconTop + icon.intrinsicHeight
+
+                when {
+                    dX < 0 -> {
+                        val iconLeft = itemView.right - iconMargin - icon.intrinsicWidth
+                        val iconRight = itemView.right - iconMargin
+                        icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+
+                        background.setBounds(itemView.right + dX.toInt() - backgroundCornerOffset,
+                                itemView.top, itemView.right, itemView.bottom)
+                    }
+                    else ->
+                        background.setBounds(0, 0, 0, 0)
+                }
+
+                background.draw(c)
+                icon.draw(c)
+            }
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+                recentlyDeletedItem = adapter.getServerAt(viewHolder.adapterPosition)
                 serverViewModel.delete(adapter.getServerAt(viewHolder.adapterPosition))
-                Toast.makeText(baseContext,
-                        adapter.getServerAt(viewHolder.adapterPosition).serverTitle + " deleted.", Toast.LENGTH_SHORT).show()
+
+                val snack = Snackbar.make(server_list_activity, recentlyDeletedItem!!.serverTitle + " deleted.", 15000)
+                snack.setAction(R.string.snackbar_undo) {
+                    serverViewModel.insert(recentlyDeletedItem!!)
+                    recentlyDeletedItem = null
+                }
+                snack.show()
             }
         }).attachToRecyclerView(recycler_view)
 
@@ -106,7 +150,7 @@ class ServerListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.action_settings -> {
                 val intent = Intent(this@ServerListActivity, SettingsActivity::class.java)
                 startActivity(intent)

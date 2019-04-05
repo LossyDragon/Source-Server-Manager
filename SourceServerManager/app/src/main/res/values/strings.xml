@@ -36,4 +36,8 @@
     <string name="button_update">Update Server</string>
     <string name="title_update">Edit Server</string>
     <string name="title_add">Add Server</string>
+    <string name="ok">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="snackbar_undo">UNDO</string>
+    <string name="show_password">Show Password</string>
 </resources>
