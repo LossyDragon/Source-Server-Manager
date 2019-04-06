@@ -17,16 +17,31 @@
         android:id="@+id/rconCommand"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:gravity="start"
         android:hint="@string/activity_rcon_text_hint"
         android:importantForAutofill="no"
         android:maxLines="1"
         android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_more"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="LabelFor,TextFields,UnusedAttribute"
         tools:text="Edit Text Box" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/button_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintTop_toTopOf="@id/rconCommand"
+        app:layout_constraintBottom_toBottomOf="@id/rconCommand"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_unfold_more"
+        android:background="?android:selectableItemBackground"
+        tools:ignore="ContentDescription" />
 
     <ScrollView
         android:id="@+id/rconResponseScroll"
@@ -81,37 +96,6 @@
         android:layout_marginBottom="8dp"
         android:layout_weight="1"
         android:text="@string/button_say"
-        app:layout_constraintBottom_toTopOf="@+id/statusButton"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="parent" />
-
-
-    <!-- RCON Log View -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/usersButton"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_weight="1"
-        android:text="@string/button_users"
-        app:layout_constraintBottom_toTopOf="@+id/rconCommand"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline" />
-
-    <!-- Banner -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/statusButton"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_weight="1"
-        android:text="@string/button_status"
         app:layout_constraintBottom_toTopOf="@+id/rconCommand"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent" />
@@ -126,7 +110,7 @@
         android:layout_marginBottom="8dp"
         android:layout_weight="1"
         android:text="@string/button_send"
-        app:layout_constraintBottom_toTopOf="@+id/usersButton"
+        app:layout_constraintBottom_toTopOf="@+id/rconCommand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline" />
 

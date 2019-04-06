@@ -3,15 +3,14 @@ package com.sourceservermanager
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
-import android.os.Bundle
-import android.os.Handler
-import android.os.PowerManager
+import android.os.*
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.PopupMenu
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import com.sourceservermanager.rcon.Rcon
@@ -91,8 +90,21 @@ open class ServerRconActivity : AppCompatActivity() {
 
         sendButton.setOnClickListener { sendButtonClicked() }
         sayButton.setOnClickListener { sayButtonClicked() }
-        statusButton.setOnClickListener { sayStatusClicked() }
-        usersButton.setOnClickListener { usersStatusClicker() }
+
+        button_more.setOnClickListener {
+            val popup = PopupMenu(this@ServerRconActivity, it)
+            popup.inflate(R.menu.menu_rcon_more)
+
+            popup.setOnMenuItemClickListener { item: MenuItem? ->
+                when(item!!.itemId) {
+                    R.id.action_users -> sayStatusClicked()
+                    R.id.action_status -> usersStatusClicker()
+                }
+                true
+            }
+
+            popup.show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -102,12 +114,7 @@ open class ServerRconActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-        when (id) {
+        when (item.itemId) {
             R.id.action_chat -> {
                 if (chatModeActive) {
                     // Disable chat mode
