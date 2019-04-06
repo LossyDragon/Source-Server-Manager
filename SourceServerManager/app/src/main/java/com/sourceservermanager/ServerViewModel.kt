@@ -23,7 +23,7 @@ class ServerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun deleteAllServers() {
-        repository.deleteAllNotes()
+        repository.deleteAllServers()
     }
 
     fun getAllServers(): LiveData<List<Server>> {

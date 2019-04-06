@@ -25,17 +25,23 @@ class AddEditServerActivity : AppCompatActivity() {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
 
         if (intent.hasExtra(EXTRA_ID)) {
-            title = resources.getString(R.string.title_update)
             nickname.setText(intent.getStringExtra(EXTRA_TITLE))
             address.setText(intent.getStringExtra(EXTRA_IP))
             port.setText(intent.getStringExtra(EXTRA_PORT))
             password.setText(intent.getStringExtra(EXTRA_PASSWORD))
+
+            title = if (nickname.text.toString().isBlank())
+                String.format(resources.getString(R.string.title_edit_activity), address.text)
+            else
+                String.format(resources.getString(R.string.title_edit_activity), nickname.text)
+
             add_server_button.text = resources.getString(R.string.button_update)
         } else {
-            title = resources.getString(R.string.title_add)
+            title = resources.getString(R.string.title_add_activity)
+            add_server_button.text = resources.getString(R.string.button_add)
         }
 
-        add_server_button.setOnClickListener { saveNote() }
+        add_server_button.setOnClickListener { saveServer() }
 
         show_password.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
@@ -49,7 +55,7 @@ class AddEditServerActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveNote() {
+    private fun saveServer() {
 
         val serverAddress: String = address.text.toString()
         val serverPort: String = port.text.toString()

@@ -46,18 +46,18 @@ class TCPClient(listener: OnMessageReceived) {
         }
     }
 
-    fun run(messageOnConnect: String) {
+    fun run(messageOnConnect: String, ip: String, port: Int) {
 
         mRun = true
 
         try {
             //here you must put your computer's IP address.
-            val serverAddr = InetAddress.getByName(SERVER_IP)
+            val serverAddr = InetAddress.getByName(ip)
 
             Log.e("TCP Client", "C: Connecting...")
 
             //create a socket to make the connection with the server
-            mSocket = Socket(serverAddr, SERVER_PORT)
+            mSocket = Socket(serverAddr, port)
             mSocket!!.soTimeout = 10000
 
             try {
@@ -111,9 +111,4 @@ class TCPClient(listener: OnMessageReceived) {
         fun messageReceived(message: String)
     }
 
-    companion object {
-        //public static final String SERVER_IP = "104.236.78.109"; // IHTOAYA-Mini
-        const val SERVER_IP = "173.18.137.244"
-        const val SERVER_PORT = 27100
-    }
 }

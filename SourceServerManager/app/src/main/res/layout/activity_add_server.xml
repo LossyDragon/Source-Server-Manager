@@ -1,123 +1,113 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginEnd="16dp"
-    android:layout_marginStart="16dp"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/address_Layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="12dp"
-        android:hint="@string/prompt_address"
-        app:layout_constraintTop_toBottomOf="@id/nickname_Layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/address"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/nickname_Layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions"
-            android:maxLines="1"
-            android:singleLine="true" />
+            android:hint="@string/activity_server_text_hint_nickname"
+            app:hintTextColor="@android:color/white">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions"
+                android:maxLines="1"
+                android:singleLine="true" />
 
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/port_Layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="12dp"
-        android:hint="@string/prompt_port"
-        app:layout_constraintTop_toBottomOf="@id/address_Layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/port"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_Layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:digits="0123456789"
-            android:maxLength="5"
-            android:maxLines="1"
-            android:singleLine="true" />
+            android:hint="@string/activity_server_text_hint_hostname"
+            app:hintTextColor="@android:color/white">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/password_Layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="12dp"
-        android:hint="@string/prompt_password"
-        app:layout_constraintTop_toBottomOf="@id/port_Layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/port_Layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeActionId="1001"
-            android:imeActionLabel="@string/action_add_server_short"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:singleLine="true" />
+            android:hint="@string/activity_server_text_hint_port"
+            app:hintTextColor="@android:color/white">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+                android:inputType="phone"
+                android:maxLength="5"
+                android:maxLines="1"
+                android:singleLine="true" />
 
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/nickname_Layout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp"
-        android:hint="@string/prompt_nickname"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/nickname"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/password_Layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions"
-            android:maxLines="1"
-            android:singleLine="true" />
+            android:hint="@string/activity_server_text_hint_password"
+            app:hintTextColor="@android:color/white">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeActionId="1001"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true"/>
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/show_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/show_password"
-        app:layout_constraintTop_toBottomOf="@id/password_Layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Android Studio Canary 10 or
-            Material broke rendering on this button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/add_server_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="@string/action_add_server"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/show_password" />
+        <CheckBox
+            android:id="@+id/show_password"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_show_password" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_server_button"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="fill_parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
+            android:layout_height="wrap_content"
+            android:text="@string/button_add"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+</ScrollView>

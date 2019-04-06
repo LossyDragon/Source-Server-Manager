@@ -159,7 +159,7 @@ object SourceRcon {
                     }
                 }
                 /*
-            	byte[] request = contructPacket(2, SERVERDATA_EXECCOMMAND, command);
+            	byte[] request = constructPacket(2, SERVERDATA_EXECCOMMAND, command);
             	out.write(request);
 
 
@@ -323,7 +323,7 @@ object SourceRcon {
     @Throws(SocketTimeoutException::class)
     private fun sendCommand(command: String): Array<ByteBuffer?> {
 
-        val request = contructPacket(2, SERVERDATA_EXECCOMMAND, command)
+        val request = constructPacket(2, SERVERDATA_EXECCOMMAND, command)
 
         val resp = arrayOfNulls<ByteBuffer>(128)
         var i = 0
@@ -381,7 +381,7 @@ object SourceRcon {
     }
      */
 
-    private fun contructPacket(id: Int, cmdtype: Int, s1: String): ByteArray {
+    private fun constructPacket(id: Int, cmdtype: Int, s1: String): ByteArray {
 
         val p = ByteBuffer.allocate(s1.length + 16)
         p.order(ByteOrder.LITTLE_ENDIAN)
@@ -453,7 +453,7 @@ object SourceRcon {
     @Throws(SocketTimeoutException::class)
     private fun rconAuth(rcon_password: String): Boolean {
 
-        val authRequest = contructPacket(1337, SERVERDATA_AUTH, rcon_password)
+        val authRequest = constructPacket(1337, SERVERDATA_AUTH, rcon_password)
 
         var response: ByteBuffer?
         try {

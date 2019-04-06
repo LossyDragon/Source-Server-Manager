@@ -18,23 +18,21 @@ class ServerRepo(application: Application) {
         allServers = serverDao.getAllServers()
     }
 
-    fun insert(note: Server) {
-        val insertNoteAsyncTask = InsertNoteAsyncTask(serverDao).execute(note)
+    fun insert(server: Server) {
+        InsertServerAsyncTask(serverDao).execute(server)
     }
 
-    fun update(note: Server) {
-        val updateNoteAsyncTask = UpdateNoteAsyncTask(serverDao).execute(note)
+    fun update(server: Server) {
+        UpdateServerAsyncTask(serverDao).execute(server)
     }
 
 
-    fun delete(note: Server) {
-        val deleteNoteAsyncTask = DeleteNoteAsyncTask(serverDao).execute(note)
+    fun delete(server: Server) {
+        DeleteServerAsyncTask(serverDao).execute(server)
     }
 
-    fun deleteAllNotes() {
-        val deleteAllNotesAsyncTask = DeleteAllNotesAsyncTask(
-                serverDao
-        ).execute()
+    fun deleteAllServers() {
+        DeleteAllServersAsyncTask(serverDao).execute()
     }
 
     fun getAllServers(): LiveData<List<Server>> {
@@ -42,25 +40,25 @@ class ServerRepo(application: Application) {
     }
 
     companion object {
-        private class InsertNoteAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
+        private class InsertServerAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
             override fun doInBackground(vararg p0: Server?) {
                 serverDao.insert(p0[0]!!)
             }
         }
 
-        private class UpdateNoteAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
+        private class UpdateServerAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
             override fun doInBackground(vararg p0: Server?) {
                 serverDao.update(p0[0]!!)
             }
         }
 
-        private class DeleteNoteAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
+        private class DeleteServerAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
             override fun doInBackground(vararg p0: Server?) {
                 serverDao.delete(p0[0]!!)
             }
         }
 
-        private class DeleteAllNotesAsyncTask(val serverDao: ServerDao) : AsyncTask<Unit, Unit, Unit>() {
+        private class DeleteAllServersAsyncTask(val serverDao: ServerDao) : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg p0: Unit?) {
                 serverDao.deleteAllServers()
             }

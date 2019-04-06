@@ -7,13 +7,13 @@ import androidx.room.*
 interface ServerDao {
 
     @Insert
-    fun insert(note: Server)
+    fun insert(server: Server)
 
     @Update
-    fun update(note: Server)
+    fun update(server: Server)
 
     @Delete
-    fun delete(note: Server)
+    fun delete(server: Server)
 
     @Query("DELETE FROM server_table")
     fun deleteAllServers()

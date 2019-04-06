@@ -2,11 +2,13 @@ package com.sourceservermanager
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -34,14 +36,12 @@ class ServerListActivity : AppCompatActivity() {
 
     private lateinit var serverViewModel: ServerViewModel
     private var recentlyDeletedItem: Server? = null
-    private lateinit var adapter: ServerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_server_list)
 
-        //setSupportActionBar(toolbar)
-        setTitle(R.string.title_server_list)
+        title = resources.getString(R.string.title_server_activity)
 
         add_server_fab.setOnClickListener {
             startActivityForResult(
@@ -53,7 +53,7 @@ class ServerListActivity : AppCompatActivity() {
         recycler_view.layoutManager = LinearLayoutManager(this@ServerListActivity)
         recycler_view.setHasFixedSize(true)
 
-        adapter = ServerAdapter()
+        val adapter = ServerAdapter()
         recycler_view.adapter = adapter
 
         serverViewModel = ViewModelProviders.of(this@ServerListActivity).get(ServerViewModel::class.java)
@@ -64,8 +64,8 @@ class ServerListActivity : AppCompatActivity() {
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-            private val icon: Drawable = resources.getDrawable(R.drawable.ic_delete, null)
-            private val background: ColorDrawable = ColorDrawable(resources.getColor(R.color.colorAccent, null))
+            private var icon: Drawable? = null
+            private var background: ColorDrawable? = null
 
             override fun onMove(
                     recyclerView: RecyclerView,
@@ -75,31 +75,41 @@ class ServerListActivity : AppCompatActivity() {
                 return false
             }
 
+
             override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+                @Suppress("DEPRECATION")
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+                    icon = resources.getDrawable(R.drawable.ic_delete)
+                    background = ColorDrawable(resources.getColor(R.color.colorAccent))
+                } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                    icon = resources.getDrawable(R.drawable.ic_delete, null)
+                    background = ColorDrawable(resources.getColor(R.color.colorAccent, null))
+                }
 
                 val itemView = viewHolder.itemView
                 val backgroundCornerOffset = 20
 
-                val iconMargin = (itemView.height - icon.intrinsicHeight) / 2
-                val iconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
-                val iconBottom = iconTop + icon.intrinsicHeight
+                val iconMargin = (itemView.height - icon!!.intrinsicHeight) / 2
+                val iconTop = itemView.top + (itemView.height - icon!!.intrinsicHeight) / 2
+                val iconBottom = iconTop + icon!!.intrinsicHeight
 
                 when {
                     dX < 0 -> {
-                        val iconLeft = itemView.right - iconMargin - icon.intrinsicWidth
+                        val iconLeft = itemView.right - iconMargin - icon!!.intrinsicWidth
                         val iconRight = itemView.right - iconMargin
-                        icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                        icon!!.setBounds(iconLeft, iconTop, iconRight, iconBottom)
 
-                        background.setBounds(itemView.right + dX.toInt() - backgroundCornerOffset,
+                        background!!.setBounds(itemView.right + dX.toInt() - backgroundCornerOffset,
                                 itemView.top, itemView.right, itemView.bottom)
                     }
                     else ->
-                        background.setBounds(0, 0, 0, 0)
+                        background!!.setBounds(0, 0, 0, 0)
                 }
 
-                background.draw(c)
-                icon.draw(c)
+                background!!.draw(c)
+                icon!!.draw(c)
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -156,10 +166,30 @@ class ServerListActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
-            R.id.action_add_server -> {
-                val intent = Intent(this@ServerListActivity, AddEditServerActivity::class.java)
-                startActivity(intent)
-                return true
+            R.id.action_delete -> {
+                //TODO buttons are ugly with MaterialComponents.
+                val builder = AlertDialog.Builder(this@ServerListActivity)
+                        .setCancelable(true)
+                        .setTitle(resources.getString(R.string.dialog_delete_title))
+                        .setMessage(resources.getString(R.string.dialog_delete_message))
+                        .setPositiveButton(
+                                resources.getString(R.string.dialog_delete_delete)) { _, _ ->
+                            serverViewModel.deleteAllServers()
+                        }
+                        .setNegativeButton(
+                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+
+                        }
+
+                val dialog = builder.create()
+                dialog.show()
+            }
+            R.id.action_help -> {
+                //val intent = Intent(this@ServerListActivity, HelpActivity::class.java)
+                //startActivity(intent)
+                //return true
+                //TODO add basic help activity
+                Toast.makeText(baseContext, "TODO: HELP Activity", Toast.LENGTH_LONG).show()
             }
         }
         return super.onOptionsItemSelected(item)

@@ -10,10 +10,11 @@
 
     <application
         android:icon="@mipmap/ssm_launcher"
+        android:allowBackup="false"
         android:label="@string/app_name"
-        android:supportsRtl="false"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        android:supportsRtl="false"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <activity
             android:name=".ServerListActivity"
@@ -28,7 +29,6 @@
 
         <activity
             android:name=".AddEditServerActivity"
-            android:label="@string/title_activity_add_server"
             android:parentActivityName=".ServerListActivity"
             android:theme="@style/AppTheme">
             <meta-data
@@ -38,7 +38,6 @@
 
         <activity
             android:name=".ServerRconActivity"
-            android:label="@string/title_activity_server_rcon"
             android:parentActivityName=".ServerListActivity"
             android:theme="@style/AppTheme">
             <meta-data

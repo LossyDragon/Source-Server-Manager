@@ -6,6 +6,8 @@ import android.preference.PreferenceActivity
 /**
  * Created by Matthew on 2/22/2016.
  */
+
+@Suppress("DEPRECATION")
 class SettingsActivity : PreferenceActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
