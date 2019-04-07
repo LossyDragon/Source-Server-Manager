@@ -45,6 +45,7 @@
     <!-- RCON related Messages/Responses/Errors -->
     <string name="warning_remote_disconnect">\n****\nRemote user disabled Chat Mode.\nThis can happen when multiple users are using Source Server Manager on the same server.\nPlease re-enable it if you wish to continue using it\n****\n</string>
     <string name="error_failed_rcon">Failed to send RCON command.\n</string>
+    <string name="error_not_online">Server is not online or responding.\n</string>
     <string name="error_empty_rcon">RCON response empty (sent successfully).\n</string>
     <string name="error_bad_rcon">Incorrect RCON password.\n</string>
     <string name="error_socket_timeout">Connection timed out.\n</string>

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sourceservermanager.data.Server
 import kotlinx.android.synthetic.main.card_view_row.view.*
 
-class ServerAdapter : ListAdapter<Server, ServerAdapter.NoteHolder>(DIFF_CALLBACK) {
+class ServerAdapter : ListAdapter<Server, ServerAdapter.ServerHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Server>() {
@@ -30,12 +30,12 @@ class ServerAdapter : ListAdapter<Server, ServerAdapter.NoteHolder>(DIFF_CALLBAC
     private var longListener: OnItemLongClickListener? = null
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServerHolder {
         val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.card_view_row, parent, false)
-        return NoteHolder(itemView)
+        return ServerHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: NoteHolder, position: Int) {
+    override fun onBindViewHolder(holder: ServerHolder, position: Int) {
         val currentNote: Server = getItem(position)
 
         holder.textViewName.text = currentNote.serverTitle
@@ -47,7 +47,7 @@ class ServerAdapter : ListAdapter<Server, ServerAdapter.NoteHolder>(DIFF_CALLBAC
         return getItem(position)
     }
 
-    inner class NoteHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ServerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition

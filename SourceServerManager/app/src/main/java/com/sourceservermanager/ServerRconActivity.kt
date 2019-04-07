@@ -3,23 +3,20 @@ package com.sourceservermanager
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.*
-import android.preference.PreferenceManager
+import android.os.AsyncTask
+import android.os.Bundle
+import android.os.Handler
+import android.os.PowerManager
 import android.util.Log
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
-import com.sourceservermanager.rcon.Rcon
-import com.sourceservermanager.rcon.SourceRcon
-import com.sourceservermanager.rcon.exception.BadRcon
-import com.sourceservermanager.rcon.exception.ResponseEmpty
+import com.sourceservermanager.rcon.RconConnection
+import com.sourceservermanager.rcon.exception.*
 import kotlinx.android.synthetic.main.activity_server_rcon.*
-import java.io.IOException
-import java.net.SocketTimeoutException
 
 open class ServerRconActivity : AppCompatActivity() {
 
@@ -36,11 +33,13 @@ open class ServerRconActivity : AppCompatActivity() {
 
     //Server Variables
     private var nickname: String? = null
-    var hostname: String? = null
-    var port: Int = 0
+    private var address: String? = null
+    private var port: Int? = null
     private var password: String? = null
 
     var serverResponse: String? = null
+
+    private var connection: RconConnection? = null
 
     internal val mHandler = Handler()
     private val scrollHandler = Handler()
@@ -74,37 +73,62 @@ open class ServerRconActivity : AppCompatActivity() {
 
         if (intent.hasExtra(EXTRA_ID)) {
             nickname = intent.getStringExtra(EXTRA_TITLE)
-            hostname = intent.getStringExtra(EXTRA_IP)
+            address = intent.getStringExtra(EXTRA_IP)
             port = intent.getStringExtra(EXTRA_PORT).toInt()
             password = intent.getStringExtra(EXTRA_PASSWORD)
         }
 
-        Log.i(TAG, "$nickname/$hostname/$port/$password")
+        Log.i(TAG, "$nickname/$address/$port/$password")
 
         title = if (nickname!!.isBlank())
-            String.format(resources.getString(R.string.title_rcon_activity), hostname)
+            String.format(resources.getString(R.string.title_rcon_activity), address)
         else
             String.format(resources.getString(R.string.title_rcon_activity), nickname)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        sendButton.setOnClickListener { sendButtonClicked() }
-        sayButton.setOnClickListener { sayButtonClicked() }
+        sendButton.setOnClickListener { buttonClicked(false) }
+        sayButton.setOnClickListener { buttonClicked(true) }
 
         button_more.setOnClickListener {
             val popup = PopupMenu(this@ServerRconActivity, it)
             popup.inflate(R.menu.menu_rcon_more)
 
             popup.setOnMenuItemClickListener { item: MenuItem? ->
-                when(item!!.itemId) {
-                    R.id.action_users -> sayStatusClicked()
-                    R.id.action_status -> usersStatusClicker()
+                when (item!!.itemId) {
+                    R.id.action_users -> {
+                        threadRconRequest(false, arrayOf("users"))
+                    }
+                    R.id.action_status -> {
+                        threadRconRequest(false, arrayOf("status"))
+                    }
                 }
                 true
             }
 
             popup.show()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        connection?.close()
+        connection = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        nickname = null
+        address = null
+        port = null
+        password = null
+
+        // Disable chat mode before we exit
+        // NOTE: This also calls releaseWakeLock()
+        if (chatModeActive || logModeActive)
+            disableLogMode()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -159,12 +183,6 @@ open class ServerRconActivity : AppCompatActivity() {
 
                 return true
             }
-            R.id.action_settings -> {
-                val intent = Intent(this@ServerRconActivity, SettingsActivity::class.java)
-                startActivity(intent)
-
-                return true
-            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -181,7 +199,7 @@ open class ServerRconActivity : AppCompatActivity() {
         chatEnabledBanner.visibility = View.GONE
 
         // Send commands to server to run
-        threadRconRequest(false, arrayOf("logaddress_del $hostname:$port", "log off"))
+        threadRconRequest(false, arrayOf("logaddress_del $address:$port", "log off"))
     }
 
     private fun enableLogMode() {
@@ -195,23 +213,14 @@ open class ServerRconActivity : AppCompatActivity() {
         chatEnabledBanner.visibility = View.VISIBLE
 
         // Send commands to server to run
-        threadRconRequest(false, arrayOf("logaddress_add $hostname:$port", "log off", "log on"))
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Disable chat mode before we exit
-        // NOTE: This also calls releaseWakeLock()
-        if (chatModeActive || logModeActive)
-            disableLogMode()
-
+        threadRconRequest(false, arrayOf("logaddress_add $address:$port", "log off", "log on"))
     }
 
     private fun acquireWakeLock() {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
 
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "sourceservermanager:SSM Logging Lock")
-        wakeLock!!.acquire(10*60*1000L /*10 minutes*/)
+        wakeLock!!.acquire(10 * 60 * 1000L /*10 minutes*/)
     }
 
     private fun releaseWakeLock() {
@@ -224,85 +233,34 @@ open class ServerRconActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendButtonClicked() {
-        threadRconRequest(false, arrayOf(rconCommand.text.toString()))
+    private fun buttonClicked(isSay: Boolean) {
+        threadRconRequest(isSay, arrayOf(rconCommand.text.toString()))
         rconCommand.setText("")
-    }
-
-    private fun sayButtonClicked() {
-        threadRconRequest(true, arrayOf(rconCommand.text.toString()))
-        rconCommand.setText("")
-    }
-
-    private fun sayStatusClicked() {
-        threadRconRequest(false, arrayOf("status"))
-    }
-
-    private fun usersStatusClicker() {
-        threadRconRequest(false, arrayOf("users"))
     }
 
     fun sendRconRequest(command: String) {
-        // GO HERE
-        // SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        try {
-            // Check IP/port
-            serverResponse = when {
-                hostname!!.isEmpty() -> getString(R.string.error_no_ip)
-                port == -1 -> getString(R.string.error_no_port)
-                else -> // Call Source (Half Life 2 & others) rcon without local port
-                    SourceRcon.send(
-                            hostname!!,
-                            port,
-                            password!!,
-                            command,
-                            settings.getString("pref_key_rcon_timeout", "5")!!
-                    )
-            }
 
-        } catch (e: ResponseEmpty) {
-            serverResponse = getString(R.string.error_empty_rcon)
-        } catch (e: BadRcon) {
-            // Wrong RCON password
-            serverResponse = getString(R.string.error_bad_rcon)
-        } catch (e: IOException) {
-            // The socket timed out on HL2 style, try HL1! (inefficient, I know,
-            // but I don't want to add anything to server prefs now)
-            try {
-                // Call HL1 rcon with local port 0
-                serverResponse = Rcon.send(
-                        0,
-                        hostname!!,
-                        port,
-                        password!!,
-                        command,
-                        settings.getString("pref_key_rcon_timeout", "5")!!
-                )
-            } catch (e2: ResponseEmpty) {
-                serverResponse = getString(R.string.error_empty_rcon)
-            } catch (e2: SocketTimeoutException) {
-                serverResponse = getString(R.string.error_socket_timeout)
-            } catch (e2: BadRcon) {
-                // Wrong RCON password
-                serverResponse = getString(R.string.error_bad_rcon)
-            } catch (e2: Exception) {
-                // Something else happened...
-                serverResponse = getString(R.string.error_failed_rcon)
-            }
+        serverResponse = try {
 
-        } catch (e: Exception) {
-            // Something else happened...
-            serverResponse = getString(R.string.error_failed_rcon)
+            if(connection == null)
+                connection = RconConnection(address!!, port!!, password!!)
+
+            connection!!.send(command)
+
+        } catch (e: NotOnlineException) {
+            getString(R.string.error_not_online)
+        } catch (e: AuthenticationException) {
+            getString(R.string.error_bad_rcon)
+        } catch (e: ConnectException) {
+            getString(R.string.error_failed_rcon)
+        } catch (e: ResponseEmptyException) {
+            getString(R.string.error_empty_rcon)
+        } catch (e: TimeoutException) {
+            getString(R.string.error_socket_timeout)
         }
-
     }
 
-    private fun threadRconRequest(isSay: Boolean,
-                                  commands: Array<String>): Boolean {
-        // final EditText rconCommandText = (EditText)
-        // findViewById(R.id.rconCommand);
-
+    private fun threadRconRequest(isSay: Boolean, commands: Array<String>): Boolean {
         // Fire off a thread to do some work that we shouldn't do directly in
         // the UI thread
         val t = object : Thread() {
@@ -365,7 +323,7 @@ open class ServerRconActivity : AppCompatActivity() {
                 }
             })
             // Sends the message to the server with the host we want to get logs for
-            mTcpClient!!.run("$hostname:$port", hostname!!, port)
+            mTcpClient!!.run("$address:$port", address!!, port!!)
 
             return null
         }

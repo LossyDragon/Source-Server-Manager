@@ -1,5 +1,14 @@
 package com.sourceservermanager
 
+/**
+ *
+ * Credits:
+ * SSM Application: https://github.com/ViXXoR/Source-Server-Manager
+ * RCON Code: https://github.com/riking/srcds-controller (And code from ViXXoR)
+ * MVVM Example: https://github.com/berkeatac/Notes-App
+ *
+ */
+
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
@@ -161,11 +170,6 @@ class ServerListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_settings -> {
-                val intent = Intent(this@ServerListActivity, SettingsActivity::class.java)
-                startActivity(intent)
-                return true
-            }
             R.id.action_delete -> {
                 //TODO buttons are ugly with MaterialComponents.
                 val builder = AlertDialog.Builder(this@ServerListActivity)
