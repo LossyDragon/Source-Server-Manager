@@ -1,15 +1,11 @@
 package com.sourceservermanager
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.os.AsyncTask
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.PowerManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.PopupMenu
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +16,6 @@ import kotlinx.android.synthetic.main.activity_server_rcon.*
 open class ServerRconActivity : AppCompatActivity() {
 
     companion object {
-        private const val SSM_CMD = "::SSMCMD::"
         private const val TAG = "ServerRconActivity"
 
         const val EXTRA_ID = "com.sourceservermanager.EXTRA_ID"
@@ -28,26 +23,25 @@ open class ServerRconActivity : AppCompatActivity() {
         const val EXTRA_IP = "com.sourceservermanager.EXTRA_IP"
         const val EXTRA_PORT = "com.sourceservermanager.EXTRA_PORT"
         const val EXTRA_PASSWORD = "com.sourceservermanager.EXTRA_PASSWORD"
+        const val EXTRA_CV_PORT = "com.sourceservermanager.EXTRA_CV_PORT"
+        const val EXTRA_CV_PASSWORD = "com.sourceservermanager.EXTRA_CV_PASSWORD"
     }
 
     //Server Variables
+    private var id: String? = null
     private var nickname: String? = null
     private var address: String? = null
-    private var port: Int? = null
+    private var port: String? = null
     private var password: String? = null
+    private var checkValvePort: String? = null
+    private var checkValvePassword: String? = null
 
-    var serverResponse: String? = null
+    private var serverResponse: String? = null
 
     private var connection: RconConnection? = null
 
     internal val mHandler = Handler()
     private val scrollHandler = Handler()
-
-    // For Real-time logging
-    private var chatModeActive = false
-    private var logModeActive = false
-    private var mTcpClient: TCPClient? = null
-    private var wakeLock: PowerManager.WakeLock? = null
 
     // Create runnable for scrolling to bottom on scrollview
     private val scrollBottom: Runnable = Runnable {
@@ -73,8 +67,10 @@ open class ServerRconActivity : AppCompatActivity() {
         if (intent.hasExtra(EXTRA_ID)) {
             nickname = intent.getStringExtra(EXTRA_TITLE)
             address = intent.getStringExtra(EXTRA_IP)
-            port = intent.getStringExtra(EXTRA_PORT).toInt()
+            port = intent.getStringExtra(EXTRA_PORT)
             password = intent.getStringExtra(EXTRA_PASSWORD)
+            checkValvePort = intent.getStringExtra(EXTRA_CV_PORT)
+            checkValvePassword = intent.getStringExtra(EXTRA_CV_PASSWORD)
         }
 
         Log.i(TAG, "$nickname/$address/$port/$password")
@@ -122,12 +118,6 @@ open class ServerRconActivity : AppCompatActivity() {
         address = null
         port = null
         password = null
-
-        // Disable chat mode before we exit
-        // NOTE: This also calls releaseWakeLock()
-        if (chatModeActive || logModeActive)
-            disableLogMode()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -139,110 +129,39 @@ open class ServerRconActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_chat -> {
-                if (chatModeActive) {
-                    // Disable chat mode
-                    disableLogMode()
-
-                    chatModeActive = false
-                } else {
-                    if (!logModeActive) {
-                        // Enable chat mode
-                        enableLogMode()
-                    } else {
-                        logModeActive = false
-                    }
-
-                    chatModeActive = true
-                }
-                return true
+                //Go to the Chat Activity, powered by CheckValve
+                val intent = Intent(baseContext, ChatActivity::class.java)
+                intent.putExtra(ChatActivity.EXTRA_ID, id)
+                intent.putExtra(ChatActivity.EXTRA_TITLE, nickname)
+                intent.putExtra(ChatActivity.EXTRA_IP, address)
+                intent.putExtra(ChatActivity.EXTRA_PORT, port)
+                intent.putExtra(ChatActivity.EXTRA_PASSWORD, password)
+                intent.putExtra(ChatActivity.EXTRA_CV_PORT, checkValvePort)
+                intent.putExtra(ChatActivity.EXTRA_CV_PASSWORD, checkValvePassword)
+                startActivity(intent)
             }
             R.id.action_clear_log -> {
+                //Clear the RCON log
                 rconResponse.text = ""
-                // Force scroll to scroll to the bottom
                 scrollHandler.postDelayed(scrollBottom, 10)
 
-                return true
-            }
-            R.id.action_log -> {
-                if (logModeActive) {
-                    // Disable chat mode
-                    disableLogMode()
-
-                    logModeActive = false
-                } else {
-                    if (!chatModeActive) {
-                        // Enable chat mode
-                        enableLogMode()
-                    } else {
-                        chatModeActive = false
-                    }
-
-                    logModeActive = true
-                }
-
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
+            }else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 
-    private fun disableLogMode() {
-        // Disable chat mode
-        if (mTcpClient != null) {
-            mTcpClient!!.stopClient()
-            mTcpClient = null
-        }
-
-        releaseWakeLock()
-
-        chatEnabledBanner.visibility = View.GONE
-
-        // Send commands to server to run
-        threadRconRequest(false, arrayOf("logaddress_del $address:$port", "log off"))
-    }
-
-    private fun enableLogMode() {
-        // Real-time logging connection
-        ConnectTask().execute("")
-
-        // Get a wakelock so we don't disconnect from the socket
-        releaseWakeLock()
-        acquireWakeLock()
-
-        chatEnabledBanner.visibility = View.VISIBLE
-
-        // Send commands to server to run
-        threadRconRequest(false, arrayOf("logaddress_add $address:$port", "log off", "log on"))
-    }
-
-    private fun acquireWakeLock() {
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "sourceservermanager:SSM Logging Lock")
-        wakeLock!!.acquire(10 * 60 * 1000L /*10 minutes*/)
-    }
-
-    private fun releaseWakeLock() {
-        // Release the wakelock, if it's held
-        Log.d(TAG, "Releasing Wakelock")
-        if (wakeLock != null) {
-            if (wakeLock!!.isHeld) {
-                wakeLock!!.release()
-            }
-        }
-    }
 
     private fun buttonClicked(isSay: Boolean) {
         threadRconRequest(isSay, arrayOf(rconCommand.text.toString()))
         rconCommand.setText("")
     }
 
-    fun sendRconRequest(command: String) {
+    private fun sendRconRequest(command: String) {
 
         serverResponse = try {
 
             if(connection == null)
-                connection = RconConnection(address!!, port!!, password!!)
+                connection = RconConnection(address!!, port!!.toInt(), password!!)
 
             connection!!.send(command)
 
@@ -264,7 +183,6 @@ open class ServerRconActivity : AppCompatActivity() {
         // the UI thread
         val t = object : Thread() {
             override fun run() {
-                var isLogCommand = false
                 if (isSay) {
                     for (command in commands) {
                         sendRconRequest("say $command")
@@ -272,108 +190,15 @@ open class ServerRconActivity : AppCompatActivity() {
                 } else {
                     for (command in commands) {
                         if (command.length >= 3) {
-                            if (command.substring(0, 3) === "log") {
-                                isLogCommand = true
-                            }
                             sendRconRequest(command)
                         }
                     }
                 }
 
-                // We won't send response to our textview since we're going to
-                // see it with our log listener
-                // This should resolve the duplicate message issue
-                if (chatModeActive) {
-                    if (!isSay && !isLogCommand) {
-                        if (commands[0].toLowerCase() === "status") {
-                            // Don't touch response
-                        } else {
-                            // Clean up any message while logging is on, as they are quite verbose
-                            val lines = serverResponse!!.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                            serverResponse = ""
-                            for (line in lines) {
-                                if (!line.startsWith("L")) {
-                                    serverResponse = serverResponse + line + "\n"
-                                }
-                            }
-                        }
-                        mHandler.post(mUpdateResults)
-                    }
-                } else {
-                    mHandler.post(mUpdateResults)
-                }
+                mHandler.post(mUpdateResults)
             }
         }
         t.start()
         return true
-    }
-
-    //This is bad
-    @SuppressLint("StaticFieldLeak")
-    inner class ConnectTask : AsyncTask<String, String, TCPClient>() {
-        override fun doInBackground(vararg message: String): TCPClient? {
-
-            //we create a TCPClient object and
-            mTcpClient = TCPClient(object : TCPClient.OnMessageReceived {
-                override fun messageReceived(message: String) {
-                    //here the messageReceived method is implemented
-                    //this method calls the onProgressUpdate
-                    publishProgress(message)
-                }
-            })
-            // Sends the message to the server with the host we want to get logs for
-            mTcpClient!!.run("$address:$port", address!!, port!!)
-
-            return null
-        }
-
-        override fun onProgressUpdate(vararg values: String) {
-            super.onProgressUpdate(*values)
-
-            var tempResp = values[0]
-
-            // Intercept any SSM messages
-            val ssmCmdIndex = tempResp.indexOf(SSM_CMD)
-            if (ssmCmdIndex >= 0) {
-                // It's a SSMCMD, check what the 2-character command is
-                val startIndex = ssmCmdIndex + SSM_CMD.length
-                val ssmCmd = tempResp.substring(startIndex, startIndex + 2)
-
-                //val check = ssmCmd.equals("UD", ignoreCase = true)
-                if (ssmCmd.equals("UD", ignoreCase = true)) {
-                    serverResponse = getString(R.string.warning_remote_disconnect)
-                    mHandler.post(mUpdateResults)
-
-                    disableLogMode()
-                }
-            } else {
-
-                // Filter server log for say and say_team messages
-                tempResp = tempResp.substring(tempResp.indexOf(":") + 8)
-
-                val filterList = arrayOf("\" say \"", "\" say_team \"")
-
-                if (chatModeActive) {
-                    for (filter in filterList) {
-                        val sayIndex = tempResp.indexOf(filter)
-                        if (sayIndex > 0) {
-                            val userName = tempResp.substring(1, tempResp.indexOf("<"))
-                            val msg = tempResp.substring(tempResp.indexOf("\"", sayIndex + 1) + 1, tempResp.lastIndexOf("\""))
-
-                            serverResponse = if (filter.contains("say_team")) {
-                                "$userName<T>: $msg\n"
-                            } else {
-                                "$userName: $msg\n"
-                            }
-
-                            mHandler.post(mUpdateResults)
-                        }
-                    }
-                } else {
-                    serverResponse = tempResp
-                    mHandler.post(mUpdateResults)
-                }
-            }
-        }
     }
 }

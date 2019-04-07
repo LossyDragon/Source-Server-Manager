@@ -5,11 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Server::class], version = 1)
+@Database(entities = [Server::class, Chat::class], version = 2)
 abstract class ApplicationDatabase : RoomDatabase() {
 
     abstract fun serverDao(): ServerDao
-
+    abstract fun chatDao(): ChatDao
 
     companion object {
         private var instance: ApplicationDatabase? = null
@@ -20,7 +20,7 @@ abstract class ApplicationDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                             context.applicationContext,
                             ApplicationDatabase::class.java, "ssm_database")
-                            //.fallbackToDestructiveMigration()
+                            .fallbackToDestructiveMigration()
                             .build()
                 }
             }

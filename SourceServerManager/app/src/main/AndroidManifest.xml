@@ -3,17 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.sourceservermanager">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
-        android:icon="@mipmap/ssm_launcher"
         android:allowBackup="false"
+        android:icon="@mipmap/ssm_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
         android:supportsRtl="false"
+        android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
@@ -26,7 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".AddEditServerActivity"
             android:parentActivityName=".ServerListActivity"
@@ -35,7 +34,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sourceservermanager.ServerListActivity" />
         </activity>
-
         <activity
             android:name=".ServerRconActivity"
             android:parentActivityName=".ServerListActivity"
@@ -46,12 +44,13 @@
         </activity>
 
         <activity
-            android:name=".SettingsActivity"
-            android:exported="false">
-            <intent-filter>
-                <category android:name="android.intent.category.PREFERENCE" />
-            </intent-filter>
+            android:name=".ChatActivity"
+            android:parentActivityName=".ServerListActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sourceservermanager.ChatActivity" />
         </activity>
-    </application>
 
+    </application>
 </manifest>

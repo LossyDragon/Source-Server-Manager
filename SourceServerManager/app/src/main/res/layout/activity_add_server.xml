@@ -66,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:digits="0123456789"
                 android:inputType="phone"
+                android:text="27015"
                 android:maxLength="5"
                 android:maxLines="1"
                 android:singleLine="true" />
@@ -85,7 +86,47 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeActionId="1001"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/checkvalve_port_Layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/activity_server_text_hint_cv_port"
+            app:hintTextColor="@android:color/white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/checkvalve_port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+                android:inputType="phone"
+                android:text="23456"
+                android:maxLength="5"
+                android:maxLines="1"
+                android:singleLine="true"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/checkvalve_password_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/activity_server_text_hint_cv_password"
+            app:hintTextColor="@android:color/white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/checkvalve_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:singleLine="true"/>

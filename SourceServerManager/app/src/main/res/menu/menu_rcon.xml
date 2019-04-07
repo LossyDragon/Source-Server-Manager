@@ -8,15 +8,12 @@
         android:title="@string/action_chat"
         android:icon="@drawable/ic_chat_bubble"
         app:showAsAction="ifRoom|withText" />
+
     <item
         android:id="@+id/action_clear_log"
         android:orderInCategory="200"
         android:title="@string/action_clear_log"
         android:icon="@drawable/ic_clear_all"
         app:showAsAction="ifRoom|withText" />
-    <item
-        android:id="@+id/action_log"
-        android:orderInCategory="300"
-        android:title="@string/action_log"
-        app:showAsAction="never" />
+
 </menu>

@@ -16,6 +16,8 @@ class AddEditServerActivity : AppCompatActivity() {
         const val EXTRA_IP = "com.sourceservermanager.EXTRA_IP"
         const val EXTRA_PORT = "com.sourceservermanager.EXTRA_PORT"
         const val EXTRA_PASSWORD = "com.sourceservermanager.EXTRA_PASSWORD"
+        const val EXTRA_CV_PORT = "com.sourceservermanager.EXTRA_CV_PORT"
+        const val EXTRA_CV_PASSWORD = "com.sourceservermanager.EXTRA_CV_PASSWORD"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +31,8 @@ class AddEditServerActivity : AppCompatActivity() {
             address.setText(intent.getStringExtra(EXTRA_IP))
             port.setText(intent.getStringExtra(EXTRA_PORT))
             password.setText(intent.getStringExtra(EXTRA_PASSWORD))
+            checkvalve_port.setText(intent.getStringExtra(EXTRA_CV_PORT))
+            checkvalve_password.setText(intent.getStringExtra(EXTRA_CV_PASSWORD))
 
             title = if (nickname.text.toString().isBlank())
                 String.format(resources.getString(R.string.title_edit_activity), address.text)
@@ -47,10 +51,14 @@ class AddEditServerActivity : AppCompatActivity() {
             if (!isChecked) {
                 password.transformationMethod = PasswordTransformationMethod.getInstance()
                 password.setSelection(password.text!!.length)
+                checkvalve_password.transformationMethod = PasswordTransformationMethod.getInstance()
+                checkvalve_password.setSelection(checkvalve_password.text!!.length)
 
             } else {
                 password.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 password.setSelection(password.text!!.length)
+                checkvalve_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                checkvalve_password.setSelection(checkvalve_password.text!!.length)
             }
         }
     }
@@ -84,11 +92,21 @@ class AddEditServerActivity : AppCompatActivity() {
             return
         }
 
+        //Check if port is valid - For CheckValve
+        val checkValvePort = checkvalve_port.text.toString()
+        if (checkValvePort != "" && checkValvePort.toInt() !in 1..65535) {
+            checkvalve_port.error = "Not a valid port"
+            checkvalve_port.requestFocus()
+            return
+        }
+
         val data = Intent().apply {
             putExtra(EXTRA_TITLE, nickname.text.toString())
             putExtra(EXTRA_IP, address.text.toString())
             putExtra(EXTRA_PORT, port.text.toString())
             putExtra(EXTRA_PASSWORD, password.text.toString())
+            putExtra(EXTRA_CV_PORT, checkvalve_port.text.toString())
+            putExtra(EXTRA_CV_PASSWORD, checkvalve_password.text.toString())
 
             if (intent.getIntExtra(EXTRA_ID, -1) != -1)
                 putExtra(EXTRA_ID, intent.getIntExtra(EXTRA_ID, -1))

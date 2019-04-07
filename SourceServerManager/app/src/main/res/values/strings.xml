@@ -40,6 +40,8 @@
     <string name="activity_server_text_hint_hostname">IP / Hostname</string>
     <string name="activity_server_text_hint_port">Port</string>
     <string name="activity_server_text_hint_password">RCON Password</string>
+    <string name="activity_server_text_hint_cv_port">CheckValve Chat Port (Optional)</string>
+    <string name="activity_server_text_hint_cv_password">CheckValve Chat Password (Optional)</string>
 
 
     <!-- RCON related Messages/Responses/Errors -->
@@ -56,6 +58,11 @@
     <string name="dialog_delete_message">Are you sure you want to delete all saveed servers?</string>
     <string name="dialog_delete_delete">Delete</string>
     <string name="dialog_delete_cancel">Cancel</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="snackbar_saved">Server Saved!</string>
+    <string name="snackbar_update_error">Could not update! Error!</string>
+    <string name="snackbar_not_saved">Server not saved!</string>
+    <string name="action_delete_chat">Delete Chat Log</string>
 
 
 </resources>

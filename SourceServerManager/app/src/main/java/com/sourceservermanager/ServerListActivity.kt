@@ -144,6 +144,8 @@ class ServerListActivity : AppCompatActivity() {
                 intent.putExtra(AddEditServerActivity.EXTRA_IP, server.serverIP)
                 intent.putExtra(AddEditServerActivity.EXTRA_PORT, server.serverPort)
                 intent.putExtra(AddEditServerActivity.EXTRA_PASSWORD, server.serverPassword)
+                intent.putExtra(AddEditServerActivity.EXTRA_CV_PORT, server.checkValvePort)
+                intent.putExtra(AddEditServerActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
                 startActivityForResult(intent, EDIT_SERVER_REQUEST)
             }
         })
@@ -157,6 +159,8 @@ class ServerListActivity : AppCompatActivity() {
                 intent.putExtra(ServerRconActivity.EXTRA_IP, server.serverIP)
                 intent.putExtra(ServerRconActivity.EXTRA_PORT, server.serverPort)
                 intent.putExtra(ServerRconActivity.EXTRA_PASSWORD, server.serverPassword)
+                intent.putExtra(ServerRconActivity.EXTRA_CV_PORT, server.checkValvePort)
+                intent.putExtra(ServerRconActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
                 startActivity(intent)
             }
 
@@ -209,33 +213,37 @@ class ServerListActivity : AppCompatActivity() {
 
         if (requestCode == ADD_SERVER_REQUEST && resultCode == Activity.RESULT_OK) {
             val newServer = Server(
-                    data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE),
-                    data.getStringExtra(AddEditServerActivity.EXTRA_IP),
-                    data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
-                    data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD)
+                    serverTitle = data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE),
+                    serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP),
+                    serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
+                    serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD),
+                    checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT),
+                    checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)
             )
             serverViewModel.insert(newServer)
 
-            Toast.makeText(this, "Server saved!", Toast.LENGTH_SHORT).show()
+            Snackbar.make(server_list_activity, resources.getString(R.string.snackbar_saved), Snackbar.LENGTH_SHORT).show()
         } else if (requestCode == EDIT_SERVER_REQUEST && resultCode == Activity.RESULT_OK) {
             val id = data?.getIntExtra(AddEditServerActivity.EXTRA_ID, -1)
 
             if (id == -1) {
-                Toast.makeText(this, "Could not update! Error!", Toast.LENGTH_SHORT).show()
+                Snackbar.make(server_list_activity, resources.getString(R.string.snackbar_update_error), 8000).show()
             }
 
             val updateServer = Server(
-                    data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE),
-                    data.getStringExtra(AddEditServerActivity.EXTRA_IP),
-                    data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
-                    data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD)
+                    serverTitle = data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE),
+                    serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP),
+                    serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
+                    serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD),
+                    checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT),
+                    checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)
             )
             updateServer.id = data.getIntExtra(AddEditServerActivity.EXTRA_ID, -1)
             serverViewModel.update(updateServer)
-            Toast.makeText(this, "Server saved!", Toast.LENGTH_SHORT).show()
+            Snackbar.make(server_list_activity, resources.getString(R.string.snackbar_saved), Snackbar.LENGTH_SHORT).show()
 
         } else {
-            Toast.makeText(this, "Server not saved!", Toast.LENGTH_SHORT).show()
+            Snackbar.make(server_list_activity, resources.getString(R.string.snackbar_not_saved), Snackbar.LENGTH_SHORT).show()
         }
     }
 

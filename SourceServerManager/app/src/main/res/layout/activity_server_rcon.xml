@@ -45,12 +45,12 @@
 
     <ScrollView
         android:id="@+id/rconResponseScroll"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/view"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chatEnabledBanner">
+        app:layout_constraintBottom_toTopOf="@id/view"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/rconResponse"
@@ -59,22 +59,8 @@
             android:singleLine="false"
             android:typeface="monospace"
             tools:text="Rcon Response" />
-    </ScrollView>
 
-    <TextView
-        android:id="@+id/chatEnabledBanner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorP2Salmon"
-        android:gravity="center"
-        android:text="@string/activity_rcon_chat_banner"
-        android:textColor="@color/colorWhite"
-        android:textStyle="bold"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+    </ScrollView>
 
     <View
         android:id="@+id/view"
