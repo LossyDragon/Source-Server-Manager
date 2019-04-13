@@ -12,7 +12,7 @@
     <item
         android:id="@+id/action_clear_log"
         android:orderInCategory="200"
-        android:title="@string/action_clear_log"
+        android:title="@string/action_delete_rcon"
         android:icon="@drawable/ic_clear_all"
         app:showAsAction="ifRoom|withText" />
 

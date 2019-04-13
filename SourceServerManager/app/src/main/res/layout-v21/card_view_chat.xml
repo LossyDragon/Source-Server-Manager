@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp">
@@ -21,7 +22,9 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textStyle="bold"
-            tools:text="00:00:00" />
+            tools:text="00:00:00"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/chat_card_who"
@@ -32,16 +35,35 @@
             android:ellipsize="end"
             android:textStyle="italic"
             android:maxLines="1"
-            tools:text="Who" />
+            tools:text="Who"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chat_card_time"/>
+
+        <TextView
+            android:id="@+id/chat_card_team"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chat_card_who"
+            android:layout_marginStart="1dp"
+            android:ellipsize="end"
+            tools:text="(TEAM)"
+            app:layout_constraintLeft_toRightOf="@id/chat_card_who"
+            app:layout_constraintTop_toTopOf="@id/chat_card_who"
+            app:layout_constraintBottom_toBottomOf="@id/chat_card_who"/>
 
         <TextView
             android:id="@+id/chat_card_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/chat_card_who"
-            android:layout_marginTop="10dp"
+            android:layout_marginStart="1dp"
             android:ellipsize="end"
-            tools:text="Message" />
-    </RelativeLayout>
+            tools:text="Message"
+            app:layout_constraintLeft_toRightOf="@id/chat_card_team"
+            app:layout_constraintTop_toTopOf="@id/chat_card_team"
+            app:layout_constraintBottom_toBottomOf="@id/chat_card_team"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.sourceservermanager.data.Chat
 import kotlinx.android.synthetic.main.card_view_chat.view.*
 
@@ -19,7 +19,7 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
             }
 
             override fun areContentsTheSame(oldItem: Chat, newItem: Chat): Boolean {
-                return oldItem.timestamp == newItem.timestamp &&
+                return oldItem.messageTimestamp == newItem.messageTimestamp &&
                         oldItem.playerName == newItem.playerName &&
                         oldItem.playerTeam == newItem.playerTeam &&
                         oldItem.message == newItem.message &&
@@ -28,7 +28,7 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
         }
     }
 
-    private var listener: OnItemClickListener? = null
+    private var listener: OnItemLongClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatHolder {
         val itemView: View = LayoutInflater.from((parent.context)).inflate(R.layout.card_view_chat, parent, false)
@@ -38,9 +38,20 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
     override fun onBindViewHolder(holder: ChatHolder, position: Int) {
         val currentChat: Chat = getItem(position)
 
-        holder.chatViewTimeStamp.text = currentChat.timestamp
+        holder.chatViewTimeStamp.text = currentChat.messageTimestamp
         holder.chatViewMessage.text = currentChat.message
-        holder.chatWho.text = currentChat.sayTeamFlag // <-- I think this is right
+        holder.chatTeam.text = if (currentChat.sayTeamFlag.toInt() == -18) ": " else "(Team): "
+        holder.chatWho.text = currentChat.playerName
+
+        //Log.d("ChatAdapter", "protocolVersion >" + currentChat.protocolVersion.toString())
+        //Log.d("ChatAdapter", "sayTeamFlag >" + currentChat.sayTeamFlag)
+        //Log.d("ChatAdapter", "serverTimestamp >" + currentChat.serverTimestamp)
+        //Log.d("ChatAdapter", "gameServerIP >" + currentChat.gameServerIP)
+        //Log.d("ChatAdapter", "gameServerPort >" + currentChat.gameServerPort)
+        //Log.d("ChatAdapter", "messageTimestamp >" + currentChat.messageTimestamp)
+        //Log.d("ChatAdapter", "playerName >" + currentChat.playerName)
+        //Log.d("ChatAdapter", "playerTeam >" + currentChat.playerTeam)
+        //Log.d("ChatAdapter", "message >" + currentChat.message)
     }
 
     inner class ChatHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -48,21 +59,22 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
             itemView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    listener?.onItemClick(getItem(position))
+                    listener?.onItemLongClick(getItem(position))
                 }
             }
         }
 
         val chatViewTimeStamp: TextView = itemView.chat_card_time
         val chatViewMessage: TextView = itemView.chat_card_message
+        val chatTeam: TextView = itemView.chat_card_team
         val chatWho: TextView = itemView.chat_card_who
     }
 
-    interface OnItemClickListener {
-        fun onItemClick(chat: Chat)
+    interface OnItemLongClickListener {
+        fun onItemLongClick(chat: Chat)
     }
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
+    fun setOnItemLongClickListener(listener: OnItemLongClickListener) {
         this.listener = listener
     }
 

@@ -6,12 +6,12 @@ package com.sourceservermanager
  * SSM Application: https://github.com/ViXXoR/Source-Server-Manager
  * RCON Code: https://github.com/riking/srcds-controller (And code from ViXXoR)
  * MVVM Example: https://github.com/berkeatac/Notes-App
+ * CheckValve: https://github.com/daparker/checkvalve
  *
  */
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Canvas
@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -126,7 +127,10 @@ class ServerListActivity : AppCompatActivity() {
                 recentlyDeletedItem = adapter.getServerAt(viewHolder.adapterPosition)
                 serverViewModel.delete(adapter.getServerAt(viewHolder.adapterPosition))
 
-                val snack = Snackbar.make(server_list_activity, recentlyDeletedItem!!.serverTitle + " deleted.", 15000)
+                val snack = Snackbar.make(
+                        server_list_activity, recentlyDeletedItem!!.serverTitle +
+                        getString(R.string.snackbar_server_deleted), 15000)
+
                 snack.setAction(R.string.snackbar_undo) {
                     serverViewModel.insert(recentlyDeletedItem!!)
                     recentlyDeletedItem = null
@@ -175,11 +179,10 @@ class ServerListActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_delete -> {
-                //TODO buttons are ugly with MaterialComponents.
                 val builder = AlertDialog.Builder(this@ServerListActivity)
                         .setCancelable(true)
-                        .setTitle(resources.getString(R.string.dialog_delete_title))
-                        .setMessage(resources.getString(R.string.dialog_delete_message))
+                        .setTitle(resources.getString(R.string.dialog_delete_server))
+                        .setMessage(resources.getString(R.string.dialog_delete_server_message))
                         .setPositiveButton(
                                 resources.getString(R.string.dialog_delete_delete)) { _, _ ->
                             serverViewModel.deleteAllServers()

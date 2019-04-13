@@ -18,7 +18,7 @@ interface ChatDao {
     @Query("DELETE FROM chat_table")
     fun deleteAllChats()
 
-    @Query("SELECT * FROM chat_table ORDER BY timestamp DESC")
+    @Query("SELECT * FROM chat_table ORDER BY messageTimestamp ASC")
     fun getAllChats(): LiveData<List<Chat>>
 
 }

@@ -39,7 +39,7 @@ class ConnectException : Exception {
 
     companion object {
 
-        private val serialVersionUID = 5263271934736639145L
+        private const val serialVersionUID = 5263271934736639145L
     }
 
 }
