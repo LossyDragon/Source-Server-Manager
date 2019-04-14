@@ -15,14 +15,6 @@ class ChatViewModel(application: Application): AndroidViewModel(application) {
         repository.insert(chat)
     }
 
-    fun update(chat: Chat) {
-        repository.update(chat)
-    }
-
-    fun delete(chat: Chat) {
-        repository.delete(chat)
-    }
-
     fun deleteAllChats() {
         repository.deleteAllChats()
     }

@@ -9,12 +9,6 @@ interface ChatDao {
     @Insert
     fun insert(chat: Chat)
 
-    @Update
-    fun update(chat: Chat)
-
-    @Delete
-    fun delete(chat: Chat)
-
     @Query("DELETE FROM chat_table")
     fun deleteAllChats()
 

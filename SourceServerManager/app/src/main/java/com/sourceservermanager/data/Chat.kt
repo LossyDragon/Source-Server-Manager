@@ -23,7 +23,7 @@ data class Chat(
         var sayTeamFlag: Byte,
         var serverTimestamp: Int,
         var gameServerIP: String,
-        var gameServerPort:String,
+        var gameServerPort: String,
         var messageTimestamp: String,
         var playerName: String,
         var playerTeam: String,

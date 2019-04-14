@@ -10,8 +10,9 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
         android:padding="8dp">
 
         <TextView
@@ -57,12 +58,12 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/chat_card_who"
             android:layout_marginStart="1dp"
+            android:singleLine="true"
             android:ellipsize="end"
             tools:text="Message"
             app:layout_constraintLeft_toRightOf="@id/chat_card_team"
             app:layout_constraintTop_toTopOf="@id/chat_card_team"
             app:layout_constraintBottom_toBottomOf="@id/chat_card_team"/>
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

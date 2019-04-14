@@ -22,7 +22,6 @@ package com.sourceservermanager.checkvalve
 import android.os.Handler
 import android.os.Message
 import android.util.Log
-import com.sourceservermanager.ChatViewModel
 import com.sourceservermanager.data.Chat
 import java.io.IOException
 import java.io.InputStream
@@ -47,10 +46,10 @@ import java.nio.ByteOrder
  * @throws UnknownHostException
  */
 
-class ChatRunnable(cvm: ChatViewModel, crIP: String, crPort: String, crPassword: String, gsIP: String, gsPort: String, h: Handler) : Runnable {
+class ChatRunnable(crIP: String, crPort: String, crPassword: String, gsIP: String, gsPort: String, h: Handler) : Runnable {
 
     companion object {
-        private const val TAG = "Chat"
+        private const val TAG = "ChatRunnable"
 
         private var responseType: Byte = 0
         private var contentLength: Short = 0
@@ -59,7 +58,6 @@ class ChatRunnable(cvm: ChatViewModel, crIP: String, crPort: String, crPassword:
         private var responseMessage: StringBuilder? = null
         private var s: Socket? = null
         private var msg: Message? = null
-        //private var chatMsg: Chat? = null
         private var `in`: InputStream? = null
         private var out: OutputStream? = null
 
@@ -84,8 +82,6 @@ class ChatRunnable(cvm: ChatViewModel, crIP: String, crPort: String, crPassword:
         private const val PTYPE_CONNECTION_FAILURE = 0x03.toByte()
         private const val PTYPE_CONNECTION_SUCCESS = 0x04.toByte()
         private const val PTYPE_MESSAGE_DATA = 0x05.toByte()
-
-        private lateinit var chatViewModel: ChatViewModel
     }
 
     init {
@@ -95,8 +91,6 @@ class ChatRunnable(cvm: ChatViewModel, crIP: String, crPort: String, crPassword:
         gameServerIP = gsIP
         gameServerPort = gsPort
         handler = h
-
-        chatViewModel = cvm
     }
 
     override fun run() {
@@ -165,7 +159,6 @@ class ChatRunnable(cvm: ChatViewModel, crIP: String, crPort: String, crPassword:
         requestBuffer.flip()
 
         try {
-            //s = new Socket(chatRelayIP, chatRelayPort);
             s = Socket()
             s!!.soTimeout = 2000
             s!!.sendBufferSize = 1024
@@ -342,30 +335,19 @@ class ChatRunnable(cvm: ChatViewModel, crIP: String, crPort: String, crPassword:
 
                     val pd = PacketData(tmp)
 
-                    // Chat message
-                    //chatMsg = Chat(
-                    //        pd.byte, // Protocol version
-                    //        pd.utF8String!!, // Epoch timestamp from the Chat Relay
-                    //        pd.utF8String!!, // say_team flag
-                    //        pd.utF8String!!, // Game server IP
-                    //        pd.utF8String!!, // Game server port
-                    //        pd.utF8String!!, // Timestamp from the original message
-                    //        pd.utF8String!!
-                    //)
-
-                    chatViewModel.insert(chat = Chat(
+                    val chat = Chat(
                             pd.byte,            // Protocol version
-                            pd.byte,             // Epoch timestamp from the Chat Relay
-                            pd.int,            // say_team flag
+                            pd.byte,            // Epoch timestamp from the Chat Relay
+                            pd.int,             // say_team flag
                             pd.utF8String!!,    // Game server IP
                             pd.utF8String!!,    // Game server port
                             pd.utF8String!!,    // Timestamp from the original message
                             pd.utF8String!!,    // Player name
                             pd.utF8String!!,    // Player team
                             pd.utF8String!!     // Chat message
-                    ))
+                    )
 
-                    msg = Message.obtain(handler, 5, chatViewModel)
+                    msg = Message.obtain(handler, 5, chat)
                     handler.sendMessage(msg)
                 }
 

@@ -35,16 +35,8 @@ class ServerRepo(application: Application) {
         UpdateServerAsyncTask(serverDao).execute(server)
     }
 
-    fun update(chat: Chat) {
-        UpdateChatAsyncTask(chatDAO).execute(chat)
-    }
-
     fun delete(server: Server) {
         DeleteServerAsyncTask(serverDao).execute(server)
-    }
-
-    fun delete(chat: Chat) {
-        DeleteChatAsyncTask(chatDAO).execute(chat)
     }
 
     fun deleteAllServers() {
@@ -92,18 +84,6 @@ class ServerRepo(application: Application) {
         private class InsertChatAsyncTask(val chatDao: ChatDao) : AsyncTask<Chat, Unit, Unit>() {
             override fun doInBackground(vararg p0: Chat?) {
                 chatDao.insert(p0[0]!!)
-            }
-        }
-
-        private class UpdateChatAsyncTask(val chatDao: ChatDao) : AsyncTask<Chat, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Chat?) {
-                chatDao.update(p0[0]!!)
-            }
-        }
-
-        private class DeleteChatAsyncTask(val chatDao: ChatDao) : AsyncTask<Chat, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Chat?) {
-                chatDao.delete(p0[0]!!)
             }
         }
 

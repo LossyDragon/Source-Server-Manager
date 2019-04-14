@@ -83,27 +83,28 @@ class ChatActivity : AppCompatActivity() {
             super.handleMessage(msg)
             when(msg!!.what) {
                 -2 -> { finish() }
-                -1 -> {
-                    postSystemMessage("Failed to connect. (SocketException?)")
-                    //Toast.makeText(this@ChatActivity, "Failed to connect. (SocketException?)", Toast.LENGTH_LONG).show()
-                }
+                -1 -> { postSystemMessage("Failed to connect, possibly...") }
                 1 -> { /*Nothing - HeartBeat*/ }
-                3 -> {
-                    postSystemMessage("Connection Refused")
-                    //Toast.makeText(this@ChatActivity, "Connection Refused", Toast.LENGTH_LONG).show()
+                3 -> { postSystemMessage("Connection Refused") }
+                4 -> { postSystemMessage("Connection successful") }
+                5 -> {
+                    val chatMessage = msg.obj as Chat
+
+                    chatViewModel.insert(chat = Chat(
+                            chatMessage.protocolVersion,
+                            chatMessage.sayTeamFlag,
+                            chatMessage.serverTimestamp,
+                            chatMessage.gameServerIP,
+                            chatMessage.gameServerPort,
+                            getTime(), //Get device's time
+                            chatMessage.playerName,
+                            chatMessage.playerTeam,
+                            chatMessage.message
+                    ))
                 }
-                4 -> {
-                    postSystemMessage("Connection successful")
-                    //Toast.makeText(this@ChatActivity, "Connection successful", Toast.LENGTH_LONG).show()
-                }
-                5 -> { }
-                255 -> {
-                    postSystemMessage("Disconnected!")
-                    //Toast.makeText(this@ChatActivity, "Disconnected!", Toast.LENGTH_LONG).show()
-                }
+                255 -> { postSystemMessage("Disconnected!") }
                 else -> {
                     postSystemMessage("Handler received an unexpected value (" + msg.what + ")")
-                    //Toast.makeText(this@ChatActivity, "Handler received an unexpected value (" + msg.what + ")", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -262,7 +263,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun buttonClicked() {
-        threadRconRequest(arrayOf(chat_box.text.toString()))
+        threadRconRequest(chat_box.text.toString())
         chat_box.setText("")
         scrollToBottom()
     }
@@ -272,22 +273,19 @@ class ChatActivity : AppCompatActivity() {
         return sdf.format(Date()).toString()
     }
 
-    private fun threadRconRequest(commands: Array<String>): Boolean {
+    private fun threadRconRequest(command: String) {
         // Fire off a thread to do some work that we shouldn't do directly in
         // the UI thread
         val t = object : Thread() {
             override fun run() {
-                for (command in commands) {
                     sendRconChat("say $command")
-                }
             }
         }
         t.start()
-        return true
     }
 
     private fun scrollToBottom() {
-        recycler_chat_view.smoothScrollToPosition(adapter.itemCount - 1)
+            recycler_chat_view.smoothScrollToPosition(adapter.itemCount + 100)
     }
 
     private fun postSystemMessage(response: String) {
@@ -338,7 +336,6 @@ class ChatActivity : AppCompatActivity() {
             Log.d(TAG, "ChatRunnable: $address/$checkValvePort/$checkValvePassword/$port/$chatClientHandler")
 
             chatRunnable = ChatRunnable(
-                    chatViewModel,
                     address!!,
                     checkValvePort!!,
                     checkValvePassword!!,
@@ -377,5 +374,4 @@ class ChatActivity : AppCompatActivity() {
             receiverThread?.interrupt()
     }
     //endregion
-
 }
