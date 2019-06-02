@@ -12,7 +12,10 @@ interface ChatDao {
     @Query("DELETE FROM chat_table")
     fun deleteAllChats()
 
-    @Query("SELECT * FROM chat_table ORDER BY messageTimestamp ASC")
-    fun getAllChats(): LiveData<List<Chat>>
+    @Query("DELETE FROM chat_table WHERE gameServerIP=:ip")
+    fun deleteChatHistory(ip: String)
+
+    @Query("SELECT * FROM chat_table WHERE gameServerIP=:ip ORDER BY messageTimestamp ASC")
+    fun getChatHistory(ip: String): LiveData<List<Chat>>
 
 }

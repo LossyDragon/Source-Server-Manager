@@ -8,19 +8,16 @@ class ServerRepo(application: Application) {
 
     private var serverDao: ServerDao
     private var chatDAO: ChatDao
-
-    private var allServers: LiveData<List<Server>>
-    private var allChats: LiveData<List<Chat>>
+    private var rconDao: RconDao
 
     init {
         val database: ApplicationDatabase = ApplicationDatabase.getInstance(
                 application.applicationContext
         )!!
-        serverDao = database.serverDao()
-        allServers = serverDao.getAllServers()
 
+        serverDao = database.serverDao()
         chatDAO = database.chatDao()
-        allChats = chatDAO.getAllChats()
+        rconDao = database.rconDao()
     }
 
     fun insert(server: Server) {
@@ -29,6 +26,10 @@ class ServerRepo(application: Application) {
 
     fun insert(chat: Chat) {
         InsertChatAsyncTask(chatDAO).execute(chat)
+    }
+
+    fun insert(rcon: Rcon) {
+        InsertRconAsyncTask(rconDao).execute(rcon)
     }
 
     fun update(server: Server) {
@@ -47,15 +48,33 @@ class ServerRepo(application: Application) {
         DeleteAllChatsAsyncTask(chatDAO).execute()
     }
 
-    fun getAllServers(): LiveData<List<Server>> {
-        return allServers
+    fun deleteAllRcon() {
+        DeleteAllRconAsyncTask(rconDao).execute()
     }
 
-    fun getAllChats(): LiveData<List<Chat>> {
-        return allChats
+    fun getAllServers(): LiveData<List<Server>> {
+        return serverDao.getAllServers()
+    }
+
+    fun getChatHistory(ip: String): LiveData<List<Chat>> {
+        return chatDAO.getChatHistory(ip)
+    }
+
+    fun getRconHistory(ip: String): LiveData<List<Rcon>> {
+        return rconDao.getRconHistory(ip)
+    }
+
+    fun deleteChatHistory(ip: String) {
+        DeleteChatHistoryAsyncTask(chatDAO, ip).execute()
+    }
+
+    fun deleteRconHistory(ip: String) {
+        DeleteRconHistoryAsyncTask(rconDao, ip).execute()
     }
 
     companion object {
+
+        //Server stuff
         private class InsertServerAsyncTask(val serverDao: ServerDao) : AsyncTask<Server, Unit, Unit>() {
             override fun doInBackground(vararg p0: Server?) {
                 serverDao.insert(p0[0]!!)
@@ -90,6 +109,31 @@ class ServerRepo(application: Application) {
         private class DeleteAllChatsAsyncTask(val chatDao: ChatDao) : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg p0: Unit?) {
                 chatDao.deleteAllChats()
+            }
+        }
+
+        private class DeleteChatHistoryAsyncTask(val chatDao: ChatDao, val ip: String) : AsyncTask<Chat, Unit, Unit>() {
+            override fun doInBackground(vararg params: Chat?) {
+                chatDao.deleteChatHistory(ip)
+            }
+        }
+
+        //Rcon Stuff
+        private class InsertRconAsyncTask(val rconDao: RconDao) : AsyncTask<Rcon, Unit, Unit>() {
+            override fun doInBackground(vararg params: Rcon?) {
+                rconDao.insert(params[0]!!)
+            }
+        }
+
+        private class DeleteAllRconAsyncTask(val rconDao: RconDao) : AsyncTask <Unit, Unit, Unit>() {
+            override fun doInBackground(vararg params: Unit?) {
+                rconDao.deleteAllRcon()
+            }
+        }
+
+        private class DeleteRconHistoryAsyncTask(val rconDao: RconDao, val ip: String) : AsyncTask<Rcon, Unit, Unit>() {
+            override fun doInBackground(vararg params: Rcon?) {
+                rconDao.deleteRconHistory(ip)
             }
         }
     }

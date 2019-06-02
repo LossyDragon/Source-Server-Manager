@@ -14,8 +14,10 @@
     <string name="action_status">Status</string>
     <string name="action_chat">CheckValve Chat</string>
     <string name="action_delete_chat">Delete Chat</string>
-    <string name="action_delete_servers">Delete Servers</string>
-    <string name="action_delete_rcon">Clear Rcon Log</string>
+    <string name="action_delete_servers">Delete all Server data</string>
+    <string name="action_delete_chats">Delete all Chat data</string>
+    <string name="action_delete_rcons">Delete all Rcon data</string>
+
 
     <!-- Buttons -->
     <string name="button_update">Update Server</string>
@@ -40,10 +42,21 @@
     <string name="toast_message_copied">Message copied to clipboard.</string>
 
     <!-- Dialogs -->
-    <string name="dialog_delete_server">Delete Server List</string>
-    <string name="dialog_delete_server_message">Are you sure you want to delete the server list?</string>
+    <string name="dialog_delete_server_all">Delete Server List</string>
+    <string name="dialog_delete_server_all_message">Are you sure you want to delete the server list?</string>
+
     <string name="dialog_delete_chat">Delete Chat History</string>
     <string name="dialog_delete_chat_message">Are you sure you want to delete chat history?</string>
+
+    <string name="dialog_delete_rcon">Delete Rcon History</string>
+    <string name="dialog_delete_rcon_message">Are you sure you want to delete rcon history?</string>
+
+    <string name="dialog_delete_chat_all">Delete All Chat History</string>
+    <string name="dialog_delete_chat_all_message">Are you sure you want to delete history for all Chats?</string>
+
+    <string name="dialog_delete_rcon_all">Delete All Rcon History</string>
+    <string name="dialog_delete_rcon_all_message">Are you sure you want to delete history for all Rcon data?</string>
+
     <string name="dialog_delete_delete">Delete</string>
     <string name="dialog_delete_cancel">Cancel</string>
 
@@ -69,6 +82,7 @@
     <!-- Other -->
     <string name="clipboard_primary">SSM Chat</string>
     <string name="switch_goldSource">Enable for GoldSource</string>
+    <string name="action_delete_rcon">Clear Rcon History</string>
 
 
 </resources>

@@ -180,14 +180,48 @@ class ServerListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_delete -> {
+            R.id.action_delete_servers -> {
                 val builder = AlertDialog.Builder(this@ServerListActivity)
                         .setCancelable(true)
-                        .setTitle(resources.getString(R.string.dialog_delete_server))
-                        .setMessage(resources.getString(R.string.dialog_delete_server_message))
+                        .setTitle(resources.getString(R.string.dialog_delete_server_all))
+                        .setMessage(resources.getString(R.string.dialog_delete_server_all_message))
                         .setPositiveButton(
                                 resources.getString(R.string.dialog_delete_delete)) { _, _ ->
                             serverViewModel.deleteAllServers()
+                        }
+                        .setNegativeButton(
+                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+
+                        }
+
+                val dialog = builder.create()
+                dialog.show()
+            }
+            R.id.action_delete_rcons -> {
+                val builder = AlertDialog.Builder(this@ServerListActivity)
+                        .setCancelable(true)
+                        .setTitle(resources.getString(R.string.dialog_delete_rcon_all))
+                        .setMessage(resources.getString(R.string.dialog_delete_rcon_all_message))
+                        .setPositiveButton(
+                                resources.getString(R.string.dialog_delete_delete)) { _, _ ->
+                            serverViewModel.deleteAllRcon()
+                        }
+                        .setNegativeButton(
+                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+
+                        }
+
+                val dialog = builder.create()
+                dialog.show()
+            }
+            R.id.action_delete_chats -> {
+                val builder = AlertDialog.Builder(this@ServerListActivity)
+                        .setCancelable(true)
+                        .setTitle(resources.getString(R.string.dialog_delete_chat_all))
+                        .setMessage(resources.getString(R.string.dialog_delete_chat_all_message))
+                        .setPositiveButton(
+                                resources.getString(R.string.dialog_delete_delete)) { _, _ ->
+                            serverViewModel.deleteAllChats()
                         }
                         .setNegativeButton(
                                 resources.getString(R.string.dialog_delete_cancel)){ _, _ ->

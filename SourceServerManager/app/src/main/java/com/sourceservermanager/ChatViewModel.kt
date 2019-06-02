@@ -9,7 +9,6 @@ import com.sourceservermanager.data.ServerRepo
 class ChatViewModel(application: Application): AndroidViewModel(application) {
 
     private var repository: ServerRepo = ServerRepo(application)
-    private var allChats: LiveData<List<Chat>> = repository.getAllChats()
 
     fun insert(chat: Chat) {
         repository.insert(chat)
@@ -19,8 +18,12 @@ class ChatViewModel(application: Application): AndroidViewModel(application) {
         repository.deleteAllChats()
     }
 
-    fun getAllChats(): LiveData<List<Chat>> {
-        return allChats
+    fun deleteChatHistory(ip: String) {
+        repository.deleteChatHistory(ip)
+    }
+
+    fun getChatHistory(ip: String): LiveData<List<Chat>> {
+        return repository.getChatHistory(ip)
     }
 
 }

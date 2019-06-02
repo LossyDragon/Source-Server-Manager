@@ -26,6 +26,14 @@ class ServerViewModel(application: Application) : AndroidViewModel(application) 
         repository.deleteAllServers()
     }
 
+    fun deleteAllChats() {
+        repository.deleteAllChats()
+    }
+
+    fun deleteAllRcon() {
+        repository.deleteAllRcon()
+    }
+
     fun getAllServers(): LiveData<List<Server>> {
         return allServers
     }

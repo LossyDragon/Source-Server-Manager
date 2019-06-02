@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sourceservermanager.checkvalve.ChatRunnable
 import com.sourceservermanager.checkvalve.NetworkEventReceiver
 import com.sourceservermanager.data.Chat
+import com.sourceservermanager.rcon.GoldRconConnection
 import com.sourceservermanager.rcon.SourceRconConnection
 import com.sourceservermanager.rcon.exception.*
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -44,6 +45,7 @@ class ChatActivity : AppCompatActivity() {
         const val EXTRA_IP = "com.sourceservermanager.EXTRA_IP"
         const val EXTRA_PORT = "com.sourceservermanager.EXTRA_PORT"
         const val EXTRA_PASSWORD = "com.sourceservermanager.EXTRA_PASSWORD"
+        const val EXTRA_ISGOLDSOURCE = "com.sourceservermanager.EXTRA_ISGOLDSOURCE"
         const val EXTRA_CV_PORT = "com.sourceservermanager.EXTRA_CV_PORT"
         const val EXTRA_CV_PASSWORD = "com.sourceservermanager.EXTRA_CV_PASSWORD"
     }
@@ -52,9 +54,11 @@ class ChatActivity : AppCompatActivity() {
     private var address: String? = null
     private var port: String? = null
     private var password: String? = null
+    private var isGoldSource: Boolean? = null
     private var checkValvePort: String? = null
     private var checkValvePassword: String? = null
-    private var rconConnection: SourceRconConnection? = null
+
+    private var sourceConnection: SourceRconConnection? = null
     private lateinit var adapter: ChatAdapter
 
     //Chat Stuff
@@ -63,6 +67,14 @@ class ChatActivity : AppCompatActivity() {
     private var receiverThread: Thread? = null
     private var chatRunnable: ChatRunnable? = null
     private lateinit var chatViewModel: ChatViewModel
+
+    private val scrollHandler = Handler()
+
+    // Create runnable for scrolling to bottom on scrollview
+    private val scrollBottom: Runnable = Runnable {
+        // Force scroll to scroll to the bottom
+        recycler_chat_view.scrollToPosition(adapter.itemCount - 1)
+    }
 
     /*
      * Message object "what" codes:
@@ -160,10 +172,12 @@ class ChatActivity : AppCompatActivity() {
             address = intent.getStringExtra(EXTRA_IP)
             port = intent.getStringExtra(EXTRA_PORT)
             password = intent.getStringExtra(EXTRA_PASSWORD)
+            isGoldSource = intent.getBooleanExtra(EXTRA_ISGOLDSOURCE, false)
             checkValvePort = intent.getStringExtra(EXTRA_CV_PORT)
             checkValvePassword = intent.getStringExtra(EXTRA_CV_PASSWORD)
         } else {
             Log.w(TAG, "Intent has no data")
+            Toast.makeText(this, "Intent has no data", Toast.LENGTH_LONG).show()
             finish()
         }
 
@@ -177,10 +191,10 @@ class ChatActivity : AppCompatActivity() {
 
         chatViewModel = ViewModelProviders.of(this@ChatActivity).get(ChatViewModel::class.java)
 
-        chatViewModel.getAllChats().observe(this@ChatActivity, Observer<List<Chat>> {
+        chatViewModel.getChatHistory(address!!).observe(this@ChatActivity, Observer<List<Chat>> {
             adapter.submitList(it)
 
-            scrollToBottom()
+            scrollHandler.postDelayed(scrollBottom, 10)
         })
 
         adapter.setOnItemLongClickListener(object : ChatAdapter.OnItemLongClickListener {
@@ -201,7 +215,7 @@ class ChatActivity : AppCompatActivity() {
             return@setOnKeyListener false
         }
 
-        chat_box.setOnClickListener { scrollToBottom() }
+        chat_box.setOnClickListener { scrollHandler.postDelayed(scrollBottom, 10) }
 
         receiverRunnable = NetworkEventReceiver(this@ChatActivity, networkEventHandler)
 
@@ -235,7 +249,7 @@ class ChatActivity : AppCompatActivity() {
                         .setMessage(getString(R.string.dialog_delete_chat_message))
                         .setPositiveButton(
                                 resources.getString(R.string.dialog_delete_delete)) { _, _ ->
-                            chatViewModel.deleteAllChats()
+                            chatViewModel.deleteChatHistory(address!!)
                         }
                         .setNegativeButton(
                                 resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
@@ -258,14 +272,14 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        rconConnection?.close()
-        rconConnection = null
+        sourceConnection?.close()
+        sourceConnection = null
     }
 
     private fun buttonClicked() {
         threadRconRequest(chat_box.text.toString())
         chat_box.setText("")
-        scrollToBottom()
+        scrollHandler.postDelayed(scrollBottom, 10)
     }
 
     private fun getTime(): String {
@@ -284,10 +298,6 @@ class ChatActivity : AppCompatActivity() {
         t.start()
     }
 
-    private fun scrollToBottom() {
-            recycler_chat_view.smoothScrollToPosition(adapter.itemCount + 100)
-    }
-
     private fun postSystemMessage(response: String) {
 
         chatViewModel.insert(chat = Chat(
@@ -302,16 +312,20 @@ class ChatActivity : AppCompatActivity() {
                 response
         ))
 
-        scrollToBottom()
+        scrollHandler.postDelayed(scrollBottom, 10)
     }
 
     private fun sendRconChat(command: String) {
 
         try {
-            if(rconConnection == null)
-                rconConnection = SourceRconConnection(address!!, port!!.toInt(), password!!)
+            if(isGoldSource!!) {
+                GoldRconConnection().send(0, address!!, port!!.toInt(), password!!, command, "5")
+            } else {
+                if(sourceConnection == null)
+                    sourceConnection = SourceRconConnection(address!!, port!!.toInt(), password!!)
 
-            rconConnection!!.send(command)
+                sourceConnection!!.send(command)
+            }
 
         } catch (e: NotOnlineException) {
             postSystemMessage(getString(R.string.error_not_online))
@@ -350,8 +364,6 @@ class ChatActivity : AppCompatActivity() {
         } catch (e: UnknownHostException){
             Log.w(TAG, e.localizedMessage)
         }
-
-
     }
 
     private fun shutDownChatRelay() {

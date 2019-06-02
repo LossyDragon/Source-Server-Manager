@@ -1,18 +1,30 @@
 package com.sourceservermanager
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.PopupMenu
-import android.widget.ScrollView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.sourceservermanager.data.Rcon
 import com.sourceservermanager.rcon.GoldRconConnection
 import com.sourceservermanager.rcon.SourceRconConnection
 import com.sourceservermanager.rcon.exception.*
 import kotlinx.android.synthetic.main.activity_server_rcon.*
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 open class ServerRconActivity : AppCompatActivity() {
 
@@ -41,7 +53,10 @@ open class ServerRconActivity : AppCompatActivity() {
 
     private var serverResponse: String? = null
 
+    private lateinit var adapter: RconAdapter
+
     private var sourceConnection: SourceRconConnection? = null
+    private lateinit var rconViewModel: RconViewModel
 
     internal val mHandler = Handler()
     private val scrollHandler = Handler()
@@ -49,17 +64,27 @@ open class ServerRconActivity : AppCompatActivity() {
     // Create runnable for scrolling to bottom on scrollview
     private val scrollBottom: Runnable = Runnable {
         // Force scroll to scroll to the bottom
-        rconResponseScroll.fullScroll(ScrollView.FOCUS_DOWN)
+        recycler_rcon_view.scrollToPosition(adapter.itemCount - 1)
     }
 
     // Create runnable for posting server response from thread
     internal val mUpdateResults: Runnable = Runnable {
         if (serverResponse != null) {
-            rconResponse.append(serverResponse)
+
+            rconViewModel.insert(rcon = Rcon(
+                  nickname!!,
+                    address!!,
+                    serverResponse!!,
+                    getTime()
+            ))
+
+            Log.i(TAG, serverResponse)
+
+            //rconResponse.append(serverResponse)
             // Force scroll to scroll to the bottom
             scrollHandler.postDelayed(scrollBottom, 10)
 
-            Log.i(TAG, serverResponse)
+            serverResponse = null
         }
     }
 
@@ -75,9 +100,13 @@ open class ServerRconActivity : AppCompatActivity() {
             isGoldSource = intent.getBooleanExtra(EXTRA_ISGOLDSOURCE, false)
             checkValvePort = intent.getStringExtra(EXTRA_CV_PORT)
             checkValvePassword = intent.getStringExtra(EXTRA_CV_PASSWORD)
+        } else {
+            Log.w(TAG, "Intent has no data")
+            Toast.makeText(this, "Intent has no data", Toast.LENGTH_LONG).show()
+            finish()
         }
 
-        Log.i(TAG, "$nickname/$address/$port/$password")
+        Log.d(TAG, "$nickname/$address/$port/$password")
 
         title = if (nickname!!.isBlank())
             String.format(resources.getString(R.string.title_rcon_activity), address)
@@ -107,6 +136,42 @@ open class ServerRconActivity : AppCompatActivity() {
 
             popup.show()
         }
+
+        rconCommand.setOnClickListener { scrollHandler.postDelayed(scrollBottom, 10) }
+
+        //We don't know what command we're trying to do when KEYCODE_ENTER is pressed, so let's not do this yet
+        //rconCommand.setOnKeyListener { _, keyCode, keyEvent ->
+        //    if (keyEvent.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+        //        buttonClicked()
+        //        return@setOnKeyListener true
+        //    }
+        //    return@setOnKeyListener false
+        //}
+
+        recycler_rcon_view.layoutManager = LinearLayoutManager(this@ServerRconActivity)
+        recycler_rcon_view.setHasFixedSize(true)
+
+        adapter = RconAdapter()
+        recycler_rcon_view.adapter = adapter
+
+        rconViewModel = ViewModelProviders.of(this@ServerRconActivity).get(RconViewModel::class.java)
+
+        rconViewModel.getRconHistory(address!!).observe(this@ServerRconActivity, Observer<List<Rcon>> {
+            adapter.submitList(it)
+
+            scrollHandler.postDelayed(scrollBottom, 10)
+        })
+
+        adapter.setOnItemLongClickListener(object : RconAdapter.OnItemLongClickListener {
+            override fun onItemLongClick(rcon: Rcon) {
+                val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.primaryClip = ClipData.newPlainText(getString(R.string.clipboard_primary), rcon.rconMessage)
+                Toast.makeText(this@ServerRconActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
+            }
+        })
+
+
+
     }
 
     override fun onPause() {
@@ -139,14 +204,27 @@ open class ServerRconActivity : AppCompatActivity() {
                 intent.putExtra(ChatActivity.EXTRA_IP, address)
                 intent.putExtra(ChatActivity.EXTRA_PORT, port)
                 intent.putExtra(ChatActivity.EXTRA_PASSWORD, password)
+                intent.putExtra(ChatActivity.EXTRA_ISGOLDSOURCE, isGoldSource)
                 intent.putExtra(ChatActivity.EXTRA_CV_PORT, checkValvePort)
                 intent.putExtra(ChatActivity.EXTRA_CV_PASSWORD, checkValvePassword)
                 startActivity(intent)
             }
             R.id.action_clear_log -> {
                 //Clear the RCON log
-                rconResponse.text = ""
-                scrollHandler.postDelayed(scrollBottom, 10)
+                val builder = AlertDialog.Builder(this@ServerRconActivity)
+                        .setTitle(getString(R.string.dialog_delete_rcon))
+                        .setMessage(getString(R.string.dialog_delete_rcon_message))
+                        .setPositiveButton(
+                                resources.getString(R.string.dialog_delete_delete)) { _, _ ->
+                            rconViewModel.deleteRconHistory(address!!)
+                        }
+                        .setNegativeButton(
+                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+
+                        }
+
+                val dialog = builder.create()
+                dialog.show()
 
             }else -> return super.onOptionsItemSelected(item)
         }
@@ -207,5 +285,10 @@ open class ServerRconActivity : AppCompatActivity() {
         }
         t.start()
         return true
+    }
+
+    private fun getTime(): String {
+        val sdf = SimpleDateFormat("MM/dd/yyyy - HH:mm:ss", Locale.ENGLISH)
+        return sdf.format(Date()).toString()
     }
 }
