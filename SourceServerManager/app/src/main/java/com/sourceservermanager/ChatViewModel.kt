@@ -14,10 +14,6 @@ class ChatViewModel(application: Application): AndroidViewModel(application) {
         repository.insert(chat)
     }
 
-    fun deleteAllChats() {
-        repository.deleteAllChats()
-    }
-
     fun deleteChatHistory(ip: String) {
         repository.deleteChatHistory(ip)
     }

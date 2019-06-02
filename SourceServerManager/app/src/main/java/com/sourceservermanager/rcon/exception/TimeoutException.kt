@@ -31,14 +31,9 @@ package com.sourceservermanager.rcon.exception
  *    <http://code.google.com/p/srcds-controller/>
  */
 
-class TimeoutException : Exception {
-
-    constructor(msg: String) : super(msg)
-
-    constructor(msg: String, exception: Exception) : super(msg, exception)
+class TimeoutException(msg: String) : Exception(msg) {
 
     companion object {
-
         private const val serialVersionUID = 5263271934736639145L
     }
 

@@ -13,7 +13,7 @@ internal class RconPacket(packet: DatagramPacket) {
     /**
      * ASCII representation of the full packet received (header included)
      */
-    var ascii = ""
+    private var ascii = ""
 
     /**
      * The data included in the packet, header removed
@@ -23,12 +23,12 @@ internal class RconPacket(packet: DatagramPacket) {
     /**
      * The full packet received (header included) in bytes
      */
-    var bytes = ByteArray(1400)
+    private var bytes = ByteArray(1400)
 
     /**
      * Length of the packet
      */
-    var length = 0
+    private var length = 0
 
     init {
 

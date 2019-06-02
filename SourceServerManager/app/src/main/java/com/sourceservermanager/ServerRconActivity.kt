@@ -4,12 +4,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -25,8 +25,7 @@ import kotlinx.android.synthetic.main.activity_server_rcon.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-open class ServerRconActivity : AppCompatActivity() {
+class ServerRconActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "ServerRconActivity"
@@ -61,6 +60,8 @@ open class ServerRconActivity : AppCompatActivity() {
     internal val mHandler = Handler()
     private val scrollHandler = Handler()
 
+    private lateinit var autocomplete: Array<String>
+
     // Create runnable for scrolling to bottom on scrollview
     private val scrollBottom: Runnable = Runnable {
         // Force scroll to scroll to the bottom
@@ -91,6 +92,11 @@ open class ServerRconActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_server_rcon)
+
+        autocomplete = SettingsActivity().readSharedPrefs(this@ServerRconActivity).split(",").toTypedArray()
+
+        for(i in autocomplete)
+            Log.d("AutoComplete", i)
 
         if (intent.hasExtra(EXTRA_ID)) {
             nickname = intent.getStringExtra(EXTRA_TITLE)
@@ -137,6 +143,14 @@ open class ServerRconActivity : AppCompatActivity() {
             popup.show()
         }
 
+        rconCommand.setAdapter(
+                ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                autocomplete
+                )
+        )
+
         rconCommand.setOnClickListener { scrollHandler.postDelayed(scrollBottom, 10) }
 
         //We don't know what command we're trying to do when KEYCODE_ENTER is pressed, so let's not do this yet
@@ -169,9 +183,6 @@ open class ServerRconActivity : AppCompatActivity() {
                 Toast.makeText(this@ServerRconActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
             }
         })
-
-
-
     }
 
     override fun onPause() {

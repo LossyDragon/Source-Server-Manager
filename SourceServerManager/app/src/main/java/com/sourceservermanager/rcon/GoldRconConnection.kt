@@ -42,7 +42,7 @@ class GoldRconConnection {
      * @param port      The port of the machine where the RCON command will go.
      * @param password  The RCON password.
      * @param command   The RCON command (without the rcon prefix).
-     * @return The reponse text from the server after trying the RCON command.
+     * @return The response text from the server after trying the RCON command.
      * @throws SocketTimeoutException when there is any problem communicating with the server.
      */
     @Throws(SocketTimeoutException::class, AuthenticationException::class, ResponseEmptyException::class)

@@ -180,6 +180,10 @@ class ServerListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_settings -> {
+                val intent = Intent(baseContext, SettingsActivity::class.java)
+                startActivity(intent)
+            }
             R.id.action_delete_servers -> {
                 val builder = AlertDialog.Builder(this@ServerListActivity)
                         .setCancelable(true)

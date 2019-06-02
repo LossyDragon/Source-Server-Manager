@@ -65,7 +65,7 @@ class SourceRconConnection(ip: String, port: Int, password: String) {
             out = rconSocket.getOutputStream()
             `in` = rconSocket.getInputStream()
         } catch (e: IOException) {
-            throw NotOnlineException(e.localizedMessage, e)
+            throw NotOnlineException(e.localizedMessage)
         }
 
         if (!authenticate(password)) {

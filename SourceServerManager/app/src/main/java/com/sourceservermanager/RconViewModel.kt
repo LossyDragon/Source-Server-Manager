@@ -14,10 +14,6 @@ class RconViewModel(application: Application): AndroidViewModel(application) {
         repository.insert(rcon)
     }
 
-    fun deleteAllRcon() {
-        repository.deleteAllRcon()
-    }
-
     fun deleteRconHistory(ip: String) {
         repository.deleteRconHistory(ip)
     }
