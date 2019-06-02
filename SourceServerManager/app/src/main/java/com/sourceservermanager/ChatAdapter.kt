@@ -40,7 +40,7 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
 
         holder.chatViewTimeStamp.text = currentChat.messageTimestamp
         holder.chatViewMessage.text = currentChat.message
-        holder.chatTeam.text = if (currentChat.sayTeamFlag.toInt() == -18) ": " else "(Team): "
+        holder.chatTeam.text = ": "
         holder.chatWho.text = currentChat.playerName
 
         //Log.d("ChatAdapter", "protocolVersion >" + currentChat.protocolVersion.toString())

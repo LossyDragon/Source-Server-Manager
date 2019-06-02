@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sourceservermanager.checkvalve.ChatRunnable
 import com.sourceservermanager.checkvalve.NetworkEventReceiver
 import com.sourceservermanager.data.Chat
-import com.sourceservermanager.rcon.RconConnection
+import com.sourceservermanager.rcon.SourceRconConnection
 import com.sourceservermanager.rcon.exception.*
 import kotlinx.android.synthetic.main.activity_chat.*
 import java.net.UnknownHostException
@@ -54,7 +54,7 @@ class ChatActivity : AppCompatActivity() {
     private var password: String? = null
     private var checkValvePort: String? = null
     private var checkValvePassword: String? = null
-    private var rconConnection: RconConnection? = null
+    private var rconConnection: SourceRconConnection? = null
     private lateinit var adapter: ChatAdapter
 
     //Chat Stuff
@@ -309,7 +309,7 @@ class ChatActivity : AppCompatActivity() {
 
         try {
             if(rconConnection == null)
-                rconConnection = RconConnection(address!!, port!!.toInt(), password!!)
+                rconConnection = SourceRconConnection(address!!, port!!.toInt(), password!!)
 
             rconConnection!!.send(command)
 

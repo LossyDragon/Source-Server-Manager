@@ -148,6 +148,7 @@ class ServerListActivity : AppCompatActivity() {
                 intent.putExtra(AddEditServerActivity.EXTRA_IP, server.serverIP)
                 intent.putExtra(AddEditServerActivity.EXTRA_PORT, server.serverPort)
                 intent.putExtra(AddEditServerActivity.EXTRA_PASSWORD, server.serverPassword)
+                intent.putExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, server.isGoldSource)
                 intent.putExtra(AddEditServerActivity.EXTRA_CV_PORT, server.checkValvePort)
                 intent.putExtra(AddEditServerActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
                 startActivityForResult(intent, EDIT_SERVER_REQUEST)
@@ -163,6 +164,7 @@ class ServerListActivity : AppCompatActivity() {
                 intent.putExtra(ServerRconActivity.EXTRA_IP, server.serverIP)
                 intent.putExtra(ServerRconActivity.EXTRA_PORT, server.serverPort)
                 intent.putExtra(ServerRconActivity.EXTRA_PASSWORD, server.serverPassword)
+                intent.putExtra(ServerRconActivity.EXTRA_ISGOLDSOURCE, server.isGoldSource)
                 intent.putExtra(ServerRconActivity.EXTRA_CV_PORT, server.checkValvePort)
                 intent.putExtra(ServerRconActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
                 startActivity(intent)
@@ -220,6 +222,7 @@ class ServerListActivity : AppCompatActivity() {
                     serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP),
                     serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
                     serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD),
+                    isGoldSource = data.getBooleanExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, false),
                     checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT),
                     checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)
             )
@@ -238,6 +241,7 @@ class ServerListActivity : AppCompatActivity() {
                     serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP),
                     serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
                     serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD),
+                    isGoldSource = data.getBooleanExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, false),
                     checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT),
                     checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)
             )

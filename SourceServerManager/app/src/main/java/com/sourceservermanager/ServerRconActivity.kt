@@ -9,7 +9,8 @@ import android.view.MenuItem
 import android.widget.PopupMenu
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
-import com.sourceservermanager.rcon.RconConnection
+import com.sourceservermanager.rcon.GoldRconConnection
+import com.sourceservermanager.rcon.SourceRconConnection
 import com.sourceservermanager.rcon.exception.*
 import kotlinx.android.synthetic.main.activity_server_rcon.*
 
@@ -23,6 +24,7 @@ open class ServerRconActivity : AppCompatActivity() {
         const val EXTRA_IP = "com.sourceservermanager.EXTRA_IP"
         const val EXTRA_PORT = "com.sourceservermanager.EXTRA_PORT"
         const val EXTRA_PASSWORD = "com.sourceservermanager.EXTRA_PASSWORD"
+        const val EXTRA_ISGOLDSOURCE = "com.sourceservermanager.EXTRA_ISGOLDSOURCE"
         const val EXTRA_CV_PORT = "com.sourceservermanager.EXTRA_CV_PORT"
         const val EXTRA_CV_PASSWORD = "com.sourceservermanager.EXTRA_CV_PASSWORD"
     }
@@ -33,12 +35,13 @@ open class ServerRconActivity : AppCompatActivity() {
     private var address: String? = null
     private var port: String? = null
     private var password: String? = null
+    private var isGoldSource: Boolean? = null
     private var checkValvePort: String? = null
     private var checkValvePassword: String? = null
 
     private var serverResponse: String? = null
 
-    private var connection: RconConnection? = null
+    private var sourceConnection: SourceRconConnection? = null
 
     internal val mHandler = Handler()
     private val scrollHandler = Handler()
@@ -69,6 +72,7 @@ open class ServerRconActivity : AppCompatActivity() {
             address = intent.getStringExtra(EXTRA_IP)
             port = intent.getStringExtra(EXTRA_PORT)
             password = intent.getStringExtra(EXTRA_PASSWORD)
+            isGoldSource = intent.getBooleanExtra(EXTRA_ISGOLDSOURCE, false)
             checkValvePort = intent.getStringExtra(EXTRA_CV_PORT)
             checkValvePassword = intent.getStringExtra(EXTRA_CV_PASSWORD)
         }
@@ -107,8 +111,8 @@ open class ServerRconActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        connection?.close()
-        connection = null
+        sourceConnection?.close()
+        sourceConnection = null
     }
 
     override fun onDestroy() {
@@ -121,7 +125,6 @@ open class ServerRconActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_rcon, menu)
         return true
     }
@@ -160,10 +163,14 @@ open class ServerRconActivity : AppCompatActivity() {
 
         serverResponse = try {
 
-            if(connection == null)
-                connection = RconConnection(address!!, port!!.toInt(), password!!)
+            if(isGoldSource!!) {
+                GoldRconConnection().send(0, address!!, port!!.toInt(), password!!, command, "5")
+            } else {
+                if(sourceConnection == null)
+                    sourceConnection = SourceRconConnection(address!!, port!!.toInt(), password!!)
 
-            connection!!.send(command)
+                sourceConnection!!.send(command)
+            }
 
         } catch (e: NotOnlineException) {
             getString(R.string.error_not_online)

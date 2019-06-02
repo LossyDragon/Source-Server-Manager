@@ -16,6 +16,7 @@ class AddEditServerActivity : AppCompatActivity() {
         const val EXTRA_IP = "com.sourceservermanager.EXTRA_IP"
         const val EXTRA_PORT = "com.sourceservermanager.EXTRA_PORT"
         const val EXTRA_PASSWORD = "com.sourceservermanager.EXTRA_PASSWORD"
+        const val EXTRA_ISGOLDSOURCE = "com.sourceservermanager.EXTRA_ISGOLDSOURCE"
         const val EXTRA_CV_PORT = "com.sourceservermanager.EXTRA_CV_PORT"
         const val EXTRA_CV_PASSWORD = "com.sourceservermanager.EXTRA_CV_PASSWORD"
     }
@@ -31,6 +32,7 @@ class AddEditServerActivity : AppCompatActivity() {
             address.setText(intent.getStringExtra(EXTRA_IP))
             port.setText(intent.getStringExtra(EXTRA_PORT))
             password.setText(intent.getStringExtra(EXTRA_PASSWORD))
+            goldSource.isChecked = intent.getBooleanExtra(EXTRA_ISGOLDSOURCE, false)
             checkvalve_port.setText(intent.getStringExtra(EXTRA_CV_PORT))
             checkvalve_password.setText(intent.getStringExtra(EXTRA_CV_PASSWORD))
 
@@ -105,6 +107,7 @@ class AddEditServerActivity : AppCompatActivity() {
             putExtra(EXTRA_IP, address.text.toString())
             putExtra(EXTRA_PORT, port.text.toString())
             putExtra(EXTRA_PASSWORD, password.text.toString())
+            putExtra(EXTRA_ISGOLDSOURCE, goldSource.isChecked)
             putExtra(EXTRA_CV_PORT, checkvalve_port.text.toString())
             putExtra(EXTRA_CV_PASSWORD, checkvalve_password.text.toString())
 

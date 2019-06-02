@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
-        android:layout_marginTop="16dp"
         android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nickname_Layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="@string/activity_server_text_hint_nickname"
             app:hintTextColor="@android:color/white">
 
@@ -36,9 +36,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/address_Layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="@string/activity_server_text_hint_hostname"
             app:hintTextColor="@android:color/white">
 
@@ -55,9 +55,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/port_Layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="@string/activity_server_text_hint_port"
             app:hintTextColor="@android:color/white">
 
@@ -67,10 +67,10 @@
                 android:layout_height="wrap_content"
                 android:digits="0123456789"
                 android:inputType="phone"
-                android:text="27015"
                 android:maxLength="5"
                 android:maxLines="1"
                 android:singleLine="true"
+                android:text="27015"
                 tools:ignore="HardcodedText" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -78,9 +78,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/password_Layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="@string/activity_server_text_hint_password"
             app:hintTextColor="@android:color/white">
 
@@ -90,16 +90,16 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:maxLines="1"
-                android:singleLine="true"/>
+                android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/checkvalve_port_Layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="@string/activity_server_text_hint_cv_port"
             app:hintTextColor="@android:color/white">
 
@@ -109,10 +109,10 @@
                 android:layout_height="wrap_content"
                 android:digits="0123456789"
                 android:inputType="phone"
-                android:text="23456"
                 android:maxLength="5"
                 android:maxLines="1"
                 android:singleLine="true"
+                android:text="23456"
                 tools:ignore="HardcodedText" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -120,9 +120,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/checkvalve_password_layout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="@string/activity_server_text_hint_cv_password"
             app:hintTextColor="@android:color/white">
 
@@ -132,26 +132,34 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:maxLines="1"
-                android:singleLine="true"/>
+                android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <CheckBox
             android:id="@+id/show_password"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="@string/checkbox_show_password" />
+
+        <CheckBox
+            android:id="@+id/goldSource"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/switch_goldSource"
+            android:checked="false"
+            />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_server_button"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="24dp"
-            android:layout_height="wrap_content"
             android:text="@string/button_add"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 </ScrollView>

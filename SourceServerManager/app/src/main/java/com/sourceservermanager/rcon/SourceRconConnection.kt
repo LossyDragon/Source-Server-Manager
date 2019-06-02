@@ -43,7 +43,7 @@ import java.net.SocketTimeoutException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class RconConnection(ip: String, port: Int, password: String) {
+class SourceRconConnection(ip: String, port: Int, password: String) {
 
     companion object {
         private const val SERVERDATA_EXECCOMMAND = 2
@@ -59,7 +59,6 @@ class RconConnection(ip: String, port: Int, password: String) {
     private var out: OutputStream
 
     init {
-
         try {
             rconSocket.connect(InetSocketAddress(ip, port), 1000)
             rconSocket.soTimeout = RESPONSE_TIMEOUT

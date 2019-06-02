@@ -68,6 +68,7 @@
 
     <!-- Other -->
     <string name="clipboard_primary">SSM Chat</string>
+    <string name="switch_goldSource">Enable for GoldSource</string>
 
 
 </resources>

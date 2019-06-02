@@ -9,6 +9,7 @@ data class Server(
         var serverIP: String,
         var serverPort: String,
         var serverPassword: String,
+        val isGoldSource: Boolean,
 
         //For CheckValve-Chat-Relay
         var checkValvePort: String,
