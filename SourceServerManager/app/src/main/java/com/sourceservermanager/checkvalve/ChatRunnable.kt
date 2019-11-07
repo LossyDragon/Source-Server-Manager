@@ -228,7 +228,7 @@ class ChatRunnable(crIP: String, crPort: String, crPassword: String, gsIP: Strin
             } else {
                 Log.w(
                         TAG,
-                        "Unexpected packet type 0x" + String.format("%s", java.lang.Byte.toString(responseType)) + "."
+                        "Unexpected packet type 0x" + String.format("%s", responseType.toString()) + "."
                 )
                 Log.d(TAG, "runChatRelayClient(): Sending -1 to handler.")
                 handler.sendEmptyMessage(-1)
@@ -278,7 +278,7 @@ class ChatRunnable(crIP: String, crPort: String, crPassword: String, gsIP: Strin
             // Get the packet type
             responseType = dataBuffer.get()
 
-            Log.d(TAG, "Packet type is 0x" + String.format("%s", java.lang.Byte.toString(responseType)) + ".")
+            Log.d(TAG, "Packet type is 0x" + String.format("%s", responseType.toString()) + ".")
 
             // No need to do anything if this is a heartbeat
             if (responseType == PTYPE_HEARTBEAT) {
@@ -314,7 +314,7 @@ class ChatRunnable(crIP: String, crPort: String, crPassword: String, gsIP: Strin
 
             when (responseType) {
                 PTYPE_CONNECTION_SUCCESS -> {
-                    Log.i(TAG, "Connected to " + chatRelayIP.hostAddress + ":" + Integer.toString(chatRelayPort) + ".")
+                    Log.i(TAG, "Connected to " + chatRelayIP.hostAddress + ":" + chatRelayPort.toString() + ".")
                     handler.sendEmptyMessage(4)
                 }
 
@@ -324,7 +324,7 @@ class ChatRunnable(crIP: String, crPort: String, crPassword: String, gsIP: Strin
 
                     val error = responseMessage!!.substring(2).trim { it <= ' ' }
                     msg = Message.obtain(handler, 3, error)
-                    handler.sendMessage(msg)
+                    handler.sendMessage(msg!!)
 
                     Log.i(TAG, "Connection refused by Chat Relay server: $error")
                 }
@@ -348,7 +348,7 @@ class ChatRunnable(crIP: String, crPort: String, crPassword: String, gsIP: Strin
                     )
 
                     msg = Message.obtain(handler, 5, chat)
-                    handler.sendMessage(msg)
+                    handler.sendMessage(msg!!)
                 }
 
                 else -> {

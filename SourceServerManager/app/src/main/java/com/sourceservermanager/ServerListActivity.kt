@@ -27,7 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -66,7 +66,7 @@ class ServerListActivity : AppCompatActivity() {
         val adapter = ServerAdapter()
         recycler_view.adapter = adapter
 
-        serverViewModel = ViewModelProviders.of(this@ServerListActivity).get(ServerViewModel::class.java)
+        serverViewModel = ViewModelProvider(this@ServerListActivity).get(ServerViewModel::class.java)
 
         serverViewModel.getAllServers().observe(this@ServerListActivity, Observer<List<Server>> {
             adapter.submitList(it)
@@ -194,7 +194,7 @@ class ServerListActivity : AppCompatActivity() {
                             serverViewModel.deleteAllServers()
                         }
                         .setNegativeButton(
-                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+                                resources.getString(R.string.dialog_delete_cancel)) { _, _ ->
 
                         }
 
@@ -211,7 +211,7 @@ class ServerListActivity : AppCompatActivity() {
                             serverViewModel.deleteAllRcon()
                         }
                         .setNegativeButton(
-                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+                                resources.getString(R.string.dialog_delete_cancel)) { _, _ ->
 
                         }
 
@@ -228,7 +228,7 @@ class ServerListActivity : AppCompatActivity() {
                             serverViewModel.deleteAllChats()
                         }
                         .setNegativeButton(
-                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+                                resources.getString(R.string.dialog_delete_cancel)) { _, _ ->
 
                         }
 
@@ -256,13 +256,13 @@ class ServerListActivity : AppCompatActivity() {
 
         if (requestCode == ADD_SERVER_REQUEST && resultCode == Activity.RESULT_OK) {
             val newServer = Server(
-                    serverTitle = data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE),
-                    serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP),
-                    serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
-                    serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD),
+                    serverTitle = data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE)!!,
+                    serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP)!!,
+                    serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT)!!,
+                    serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD)!!,
                     isGoldSource = data.getBooleanExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, false),
-                    checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT),
-                    checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)
+                    checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT)!!,
+                    checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)!!
             )
             serverViewModel.insert(newServer)
 
@@ -275,13 +275,13 @@ class ServerListActivity : AppCompatActivity() {
             }
 
             val updateServer = Server(
-                    serverTitle = data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE),
-                    serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP),
-                    serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT),
-                    serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD),
+                    serverTitle = data!!.getStringExtra(AddEditServerActivity.EXTRA_TITLE)!!,
+                    serverIP = data.getStringExtra(AddEditServerActivity.EXTRA_IP)!!,
+                    serverPort = data.getStringExtra(AddEditServerActivity.EXTRA_PORT)!!,
+                    serverPassword = data.getStringExtra(AddEditServerActivity.EXTRA_PASSWORD)!!,
                     isGoldSource = data.getBooleanExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, false),
-                    checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT),
-                    checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)
+                    checkValvePort = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PORT)!!,
+                    checkValvePassword = data.getStringExtra(AddEditServerActivity.EXTRA_CV_PASSWORD)!!
             )
             updateServer.id = data.getIntExtra(AddEditServerActivity.EXTRA_ID, -1)
             serverViewModel.update(updateServer)

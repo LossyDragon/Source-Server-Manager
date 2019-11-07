@@ -2,7 +2,6 @@ package com.sourceservermanager
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -15,7 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sourceservermanager.data.Rcon
 import com.sourceservermanager.rcon.GoldRconConnection
@@ -73,13 +72,13 @@ class ServerRconActivity : AppCompatActivity() {
         if (serverResponse != null) {
 
             rconViewModel.insert(rcon = Rcon(
-                  nickname!!,
+                    nickname!!,
                     address!!,
                     serverResponse!!,
                     getTime()
             ))
 
-            Log.i(TAG, serverResponse)
+            Log.i(TAG, "Server Response: $serverResponse")
 
             //rconResponse.append(serverResponse)
             // Force scroll to scroll to the bottom
@@ -95,7 +94,7 @@ class ServerRconActivity : AppCompatActivity() {
 
         autocomplete = SettingsActivity().readSharedPrefs(this@ServerRconActivity).split(",").toTypedArray()
 
-        for(i in autocomplete)
+        for (i in autocomplete)
             Log.d("AutoComplete", i)
 
         if (intent.hasExtra(EXTRA_ID)) {
@@ -145,9 +144,9 @@ class ServerRconActivity : AppCompatActivity() {
 
         rconCommand.setAdapter(
                 ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                autocomplete
+                        this,
+                        android.R.layout.simple_dropdown_item_1line,
+                        autocomplete
                 )
         )
 
@@ -168,7 +167,7 @@ class ServerRconActivity : AppCompatActivity() {
         adapter = RconAdapter()
         recycler_rcon_view.adapter = adapter
 
-        rconViewModel = ViewModelProviders.of(this@ServerRconActivity).get(RconViewModel::class.java)
+        rconViewModel = ViewModelProvider(this@ServerRconActivity).get(RconViewModel::class.java)
 
         rconViewModel.getRconHistory(address!!).observe(this@ServerRconActivity, Observer<List<Rcon>> {
             adapter.submitList(it)
@@ -178,8 +177,10 @@ class ServerRconActivity : AppCompatActivity() {
 
         adapter.setOnItemLongClickListener(object : RconAdapter.OnItemLongClickListener {
             override fun onItemLongClick(rcon: Rcon) {
-                val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.primaryClip = ClipData.newPlainText(getString(R.string.clipboard_primary), rcon.rconMessage)
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip: ClipData = ClipData.newPlainText(getString(R.string.clipboard_primary), rcon.rconMessage)
+                clipboard?.setPrimaryClip(clip)
+
                 Toast.makeText(this@ServerRconActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
             }
         })
@@ -230,14 +231,15 @@ class ServerRconActivity : AppCompatActivity() {
                             rconViewModel.deleteRconHistory(address!!)
                         }
                         .setNegativeButton(
-                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+                                resources.getString(R.string.dialog_delete_cancel)) { _, _ ->
 
                         }
 
                 val dialog = builder.create()
                 dialog.show()
 
-            }else -> return super.onOptionsItemSelected(item)
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
         return true
     }
@@ -252,10 +254,10 @@ class ServerRconActivity : AppCompatActivity() {
 
         serverResponse = try {
 
-            if(isGoldSource!!) {
+            if (isGoldSource!!) {
                 GoldRconConnection().send(0, address!!, port!!.toInt(), password!!, command, "5")
             } else {
-                if(sourceConnection == null)
+                if (sourceConnection == null)
                     sourceConnection = SourceRconConnection(address!!, port!!.toInt(), password!!)
 
                 sourceConnection!!.send(command)

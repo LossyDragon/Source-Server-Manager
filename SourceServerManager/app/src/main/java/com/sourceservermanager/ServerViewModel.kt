@@ -8,7 +8,6 @@ import com.sourceservermanager.data.ServerRepo
 
 class ServerViewModel(application: Application) : AndroidViewModel(application) {
     private var repository: ServerRepo = ServerRepo(application)
-    private var allServers: LiveData<List<Server>> = repository.getAllServers()
 
     fun insert(server: Server) {
         repository.insert(server)
@@ -35,6 +34,6 @@ class ServerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun getAllServers(): LiveData<List<Server>> {
-        return allServers
+        return repository.getAllServers()
     }
 }

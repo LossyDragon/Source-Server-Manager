@@ -8,7 +8,6 @@ package com.sourceservermanager
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -20,7 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sourceservermanager.checkvalve.ChatRunnable
 import com.sourceservermanager.checkvalve.NetworkEventReceiver
@@ -91,14 +90,23 @@ class ChatActivity : AppCompatActivity() {
     //TODO: HandlerLeak
     private val chatClientHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
-        override fun handleMessage(msg: Message?) {
+        override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            when(msg!!.what) {
-                -2 -> { finish() }
-                -1 -> { postSystemMessage("Failed to connect, possibly...") }
-                1 -> { /*Nothing - HeartBeat*/ }
-                3 -> { postSystemMessage("Connection Refused") }
-                4 -> { postSystemMessage("Connection successful") }
+            when (msg.what) {
+                -2 -> {
+                    finish()
+                }
+                -1 -> {
+                    postSystemMessage("Failed to connect, possibly...")
+                }
+                1 -> { /*Nothing - HeartBeat*/
+                }
+                3 -> {
+                    postSystemMessage("Connection Refused")
+                }
+                4 -> {
+                    postSystemMessage("Connection successful")
+                }
                 5 -> {
                     val chatMessage = msg.obj as Chat
 
@@ -114,7 +122,9 @@ class ChatActivity : AppCompatActivity() {
                             chatMessage.message
                     ))
                 }
-                255 -> { postSystemMessage("Disconnected!") }
+                255 -> {
+                    postSystemMessage("Disconnected!")
+                }
                 else -> {
                     postSystemMessage("Handler received an unexpected value (" + msg.what + ")")
                 }
@@ -159,7 +169,8 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
 
-        }}
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,7 +200,7 @@ class ChatActivity : AppCompatActivity() {
         adapter = ChatAdapter()
         recycler_chat_view.adapter = adapter
 
-        chatViewModel = ViewModelProviders.of(this@ChatActivity).get(ChatViewModel::class.java)
+        chatViewModel = ViewModelProvider(this@ChatActivity).get(ChatViewModel::class.java)
 
         chatViewModel.getChatHistory(address!!).observe(this@ChatActivity, Observer<List<Chat>> {
             adapter.submitList(it)
@@ -199,8 +210,10 @@ class ChatActivity : AppCompatActivity() {
 
         adapter.setOnItemLongClickListener(object : ChatAdapter.OnItemLongClickListener {
             override fun onItemLongClick(chat: Chat) {
-                val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.primaryClip = ClipData.newPlainText(getString(R.string.clipboard_primary), chat.message)
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip: ClipData = ClipData.newPlainText(getString(R.string.clipboard_primary), chat.message)
+                clipboard?.setPrimaryClip(clip)
+
                 Toast.makeText(this@ChatActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
             }
         })
@@ -242,7 +255,7 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.action_chat_delete -> {
                 val builder = AlertDialog.Builder(this@ChatActivity)
                         .setTitle(getString(R.string.dialog_delete_chat))
@@ -252,7 +265,7 @@ class ChatActivity : AppCompatActivity() {
                             chatViewModel.deleteChatHistory(address!!)
                         }
                         .setNegativeButton(
-                                resources.getString(R.string.dialog_delete_cancel)){ _, _ ->
+                                resources.getString(R.string.dialog_delete_cancel)) { _, _ ->
 
                         }
 
@@ -292,7 +305,7 @@ class ChatActivity : AppCompatActivity() {
         // the UI thread
         val t = object : Thread() {
             override fun run() {
-                    sendRconChat("say $command")
+                sendRconChat("say $command")
             }
         }
         t.start()
@@ -318,10 +331,10 @@ class ChatActivity : AppCompatActivity() {
     private fun sendRconChat(command: String) {
 
         try {
-            if(isGoldSource!!) {
+            if (isGoldSource!!) {
                 GoldRconConnection().send(0, address!!, port!!.toInt(), password!!, command, "5")
             } else {
-                if(sourceConnection == null)
+                if (sourceConnection == null)
                     sourceConnection = SourceRconConnection(address!!, port!!.toInt(), password!!)
 
                 sourceConnection!!.send(command)
@@ -361,8 +374,8 @@ class ChatActivity : AppCompatActivity() {
             chatThread = Thread(chatRunnable)
 
             chatThread?.start()
-        } catch (e: UnknownHostException){
-            Log.w(TAG, e.localizedMessage)
+        } catch (e: UnknownHostException) {
+            Log.w(TAG, e.localizedMessage!!)
         }
     }
 

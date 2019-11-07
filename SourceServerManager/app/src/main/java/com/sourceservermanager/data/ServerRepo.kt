@@ -98,7 +98,7 @@ class ServerRepo(application: Application) {
                 serverDao.deleteAllServers()
             }
         }
-        
+
         //Chat Stuff
         private class InsertChatAsyncTask(val chatDao: ChatDao) : AsyncTask<Chat, Unit, Unit>() {
             override fun doInBackground(vararg p0: Chat?) {
@@ -125,7 +125,7 @@ class ServerRepo(application: Application) {
             }
         }
 
-        private class DeleteAllRconAsyncTask(val rconDao: RconDao) : AsyncTask <Unit, Unit, Unit>() {
+        private class DeleteAllRconAsyncTask(val rconDao: RconDao) : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg params: Unit?) {
                 rconDao.deleteAllRcon()
             }
