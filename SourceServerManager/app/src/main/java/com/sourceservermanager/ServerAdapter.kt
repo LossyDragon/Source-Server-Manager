@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sourceservermanager.data.Server
 import kotlinx.android.synthetic.main.card_view_row.view.*
 
-class ServerAdapter : ListAdapter<Server, ServerAdapter.ServerHolder>(DIFF_CALLBACK) {
+class ServerAdapter(
+        private val clickListener: OnItemClickListener,
+        private val longClickListener: OnItemLongClickListener
+) : ListAdapter<Server, ServerAdapter.ServerHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Server>() {
@@ -26,21 +29,14 @@ class ServerAdapter : ListAdapter<Server, ServerAdapter.ServerHolder>(DIFF_CALLB
         }
     }
 
-    private var listener: OnItemClickListener? = null
-    private var longListener: OnItemLongClickListener? = null
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServerHolder {
         val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.card_view_row, parent, false)
         return ServerHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ServerHolder, position: Int) {
-        val currentNote: Server = getItem(position)
-
-        holder.textViewName.text = currentNote.serverTitle
-        holder.textViewHost.text = currentNote.serverIP
-        holder.textViewPort.text = currentNote.serverPort
+        val server = getServerAt(position)
+        holder.bind(server, clickListener, longClickListener)
     }
 
     fun getServerAt(position: Int): Server {
@@ -48,25 +44,27 @@ class ServerAdapter : ListAdapter<Server, ServerAdapter.ServerHolder>(DIFF_CALLB
     }
 
     inner class ServerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        init {
+        private var textViewName: TextView = itemView.card_nickname
+        private var textViewHost: TextView = itemView.card_host
+        private var textViewPort: TextView = itemView.card_port
+
+        fun bind(server: Server, clickListener: OnItemClickListener, longClickListener: OnItemLongClickListener) {
+
+            textViewName.text = server.serverTitle
+            textViewHost.text = server.serverIP
+            textViewPort.text = server.serverPort
+
             itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    listener?.onItemClick(getItem(position))
-                }
+                clickListener.onItemClick(server)
             }
+
             itemView.setOnLongClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    longListener?.onItemLongClick(getItem(position))
-                }
+                longClickListener.onItemLongClick(server)
                 true
             }
+
         }
 
-        var textViewName: TextView = itemView.card_nickname
-        var textViewHost: TextView = itemView.card_host
-        var textViewPort: TextView = itemView.card_port
     }
 
     interface OnItemClickListener {
@@ -75,13 +73,5 @@ class ServerAdapter : ListAdapter<Server, ServerAdapter.ServerHolder>(DIFF_CALLB
 
     interface OnItemLongClickListener {
         fun onItemLongClick(server: Server)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        this.listener = listener
-    }
-
-    fun setOnItemLongClickListener(listener: OnItemLongClickListener) {
-        this.longListener = listener
     }
 }

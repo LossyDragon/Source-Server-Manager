@@ -35,7 +35,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.sourceservermanager.data.Server
 import kotlinx.android.synthetic.main.activity_server_list.*
 
-class ServerListActivity : AppCompatActivity() {
+class ServerListActivity : AppCompatActivity(), ServerAdapter.OnItemClickListener, ServerAdapter.OnItemLongClickListener {
 
     companion object {
         const val ADD_SERVER_REQUEST = 1
@@ -63,7 +63,7 @@ class ServerListActivity : AppCompatActivity() {
         recycler_view.layoutManager = LinearLayoutManager(this@ServerListActivity)
         recycler_view.setHasFixedSize(true)
 
-        val adapter = ServerAdapter()
+        val adapter = ServerAdapter(this, this)
         recycler_view.adapter = adapter
 
         serverViewModel = ViewModelProvider(this@ServerListActivity).get(ServerViewModel::class.java)
@@ -138,39 +138,32 @@ class ServerListActivity : AppCompatActivity() {
                 snack.show()
             }
         }).attachToRecyclerView(recycler_view)
+    }
 
-        //Long click listener to edit a server
-        adapter.setOnItemLongClickListener(object : ServerAdapter.OnItemLongClickListener {
-            override fun onItemLongClick(server: Server) {
-                val intent = Intent(baseContext, AddEditServerActivity::class.java)
-                intent.putExtra(AddEditServerActivity.EXTRA_ID, server.id)
-                intent.putExtra(AddEditServerActivity.EXTRA_TITLE, server.serverTitle)
-                intent.putExtra(AddEditServerActivity.EXTRA_IP, server.serverIP)
-                intent.putExtra(AddEditServerActivity.EXTRA_PORT, server.serverPort)
-                intent.putExtra(AddEditServerActivity.EXTRA_PASSWORD, server.serverPassword)
-                intent.putExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, server.isGoldSource)
-                intent.putExtra(AddEditServerActivity.EXTRA_CV_PORT, server.checkValvePort)
-                intent.putExtra(AddEditServerActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
-                startActivityForResult(intent, EDIT_SERVER_REQUEST)
-            }
-        })
+    override fun onItemClick(server: Server) {
+        val intent = Intent(baseContext, ServerRconActivity::class.java)
+        intent.putExtra(ServerRconActivity.EXTRA_ID, server.id)
+        intent.putExtra(ServerRconActivity.EXTRA_TITLE, server.serverTitle)
+        intent.putExtra(ServerRconActivity.EXTRA_IP, server.serverIP)
+        intent.putExtra(ServerRconActivity.EXTRA_PORT, server.serverPort)
+        intent.putExtra(ServerRconActivity.EXTRA_PASSWORD, server.serverPassword)
+        intent.putExtra(ServerRconActivity.EXTRA_ISGOLDSOURCE, server.isGoldSource)
+        intent.putExtra(ServerRconActivity.EXTRA_CV_PORT, server.checkValvePort)
+        intent.putExtra(ServerRconActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
+        startActivity(intent)
+    }
 
-        //Click listener to launch a server for Rcon control
-        adapter.setOnItemClickListener(object : ServerAdapter.OnItemClickListener {
-            override fun onItemClick(server: Server) {
-                val intent = Intent(baseContext, ServerRconActivity::class.java)
-                intent.putExtra(ServerRconActivity.EXTRA_ID, server.id)
-                intent.putExtra(ServerRconActivity.EXTRA_TITLE, server.serverTitle)
-                intent.putExtra(ServerRconActivity.EXTRA_IP, server.serverIP)
-                intent.putExtra(ServerRconActivity.EXTRA_PORT, server.serverPort)
-                intent.putExtra(ServerRconActivity.EXTRA_PASSWORD, server.serverPassword)
-                intent.putExtra(ServerRconActivity.EXTRA_ISGOLDSOURCE, server.isGoldSource)
-                intent.putExtra(ServerRconActivity.EXTRA_CV_PORT, server.checkValvePort)
-                intent.putExtra(ServerRconActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
-                startActivity(intent)
-            }
-
-        })
+    override fun onItemLongClick(server: Server) {
+        val intent = Intent(baseContext, AddEditServerActivity::class.java)
+        intent.putExtra(AddEditServerActivity.EXTRA_ID, server.id)
+        intent.putExtra(AddEditServerActivity.EXTRA_TITLE, server.serverTitle)
+        intent.putExtra(AddEditServerActivity.EXTRA_IP, server.serverIP)
+        intent.putExtra(AddEditServerActivity.EXTRA_PORT, server.serverPort)
+        intent.putExtra(AddEditServerActivity.EXTRA_PASSWORD, server.serverPassword)
+        intent.putExtra(AddEditServerActivity.EXTRA_ISGOLDSOURCE, server.isGoldSource)
+        intent.putExtra(AddEditServerActivity.EXTRA_CV_PORT, server.checkValvePort)
+        intent.putExtra(AddEditServerActivity.EXTRA_CV_PASSWORD, server.checkValvePassword)
+        startActivityForResult(intent, EDIT_SERVER_REQUEST)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
