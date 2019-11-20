@@ -30,18 +30,17 @@ class SettingsActivity : AppCompatActivity() {
 
         prefs_edit_autocomplete.setOnClickListener {
             val text = EditText(this)
-
             text.setText(readSharedPrefs(this@SettingsActivity))
 
-            AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.dialog_rcon_autocomplete))
-                    .setMessage(getString(R.string.dialog_rcon_autocomplete_message))
-                    .setView(text)
-                    .setPositiveButton(getString(R.string.dialog_update)) { _, _ ->
-                        writeSharedPrefs(text.text.toString())
-                    }
-                    .setNegativeButton(getString(R.string.dialog_delete_cancel)) { _, _ -> }
-                    .show()
+            AlertDialog.Builder(this).apply {
+                setTitle(getString(R.string.dialog_rcon_autocomplete))
+                setMessage(getString(R.string.dialog_rcon_autocomplete_message))
+                setView(text)
+                setPositiveButton(getString(R.string.dialog_update)) { _, _ ->
+                    writeSharedPrefs(text.text.toString())
+                }
+                setNegativeButton(getString(R.string.dialog_delete_cancel)) { _, _ -> }
+            }.show()
         }
 
     }

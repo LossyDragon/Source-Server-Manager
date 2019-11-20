@@ -34,7 +34,7 @@ import java.util.*
 
 
 //This is a rough cut to understand the workings of CV Chat Relay.
-class ChatActivity : AppCompatActivity() {
+class ChatActivity : AppCompatActivity(), ChatAdapter.OnItemLongClickListener {
 
     companion object {
         const val TAG = "ChatActivity"
@@ -58,7 +58,7 @@ class ChatActivity : AppCompatActivity() {
     private var checkValvePassword: String? = null
 
     private var sourceConnection: SourceRconConnection? = null
-    private lateinit var adapter: ChatAdapter
+    private lateinit var chatAdapter: ChatAdapter
 
     //Chat Stuff
     private var receiverRunnable: NetworkEventReceiver? = null
@@ -72,7 +72,7 @@ class ChatActivity : AppCompatActivity() {
     // Create runnable for scrolling to bottom on scrollview
     private val scrollBottom: Runnable = Runnable {
         // Force scroll to scroll to the bottom
-        recycler_chat_view.scrollToPosition(adapter.itemCount - 1)
+        recycler_chat_view.scrollToPosition(chatAdapter.itemCount - 1)
     }
 
     /*
@@ -194,28 +194,18 @@ class ChatActivity : AppCompatActivity() {
 
         title = String.format(getString(R.string.title_chat_activity), nickname)
 
-        recycler_chat_view.layoutManager = LinearLayoutManager(this@ChatActivity)
-        recycler_chat_view.setHasFixedSize(true)
-
-        adapter = ChatAdapter()
-        recycler_chat_view.adapter = adapter
+        chatAdapter = ChatAdapter(this)
+        recycler_chat_view.apply {
+            layoutManager = LinearLayoutManager(this@ChatActivity)
+            adapter = chatAdapter
+            setHasFixedSize(true)
+        }
 
         chatViewModel = ViewModelProvider(this@ChatActivity).get(ChatViewModel::class.java)
-
         chatViewModel.getChatHistory(address!!).observe(this@ChatActivity, Observer<List<Chat>> {
-            adapter.submitList(it)
+            chatAdapter.submitList(it)
 
             scrollHandler.postDelayed(scrollBottom, 10)
-        })
-
-        adapter.setOnItemLongClickListener(object : ChatAdapter.OnItemLongClickListener {
-            override fun onItemLongClick(chat: Chat) {
-                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-                val clip: ClipData = ClipData.newPlainText(getString(R.string.clipboard_primary), chat.message)
-                clipboard?.setPrimaryClip(clip)
-
-                Toast.makeText(this@ChatActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
-            }
         })
 
         chat_send.setOnClickListener { buttonClicked() }
@@ -245,6 +235,14 @@ class ChatActivity : AppCompatActivity() {
 
             receiverThread!!.start()
         }
+    }
+
+    override fun onItemLongClick(chat: Chat) {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        val clip: ClipData = ClipData.newPlainText(getString(R.string.clipboard_primary), chat.message)
+        clipboard?.setPrimaryClip(clip)
+
+        Toast.makeText(this@ChatActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

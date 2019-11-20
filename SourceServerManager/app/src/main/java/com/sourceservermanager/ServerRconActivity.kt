@@ -24,10 +24,10 @@ import kotlinx.android.synthetic.main.activity_server_rcon.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ServerRconActivity : AppCompatActivity() {
+class ServerRconActivity : AppCompatActivity(), RconAdapter.OnItemLongClickListener {
 
     companion object {
-        private const val TAG = "ServerRconActivity"
+        private val TAG = ServerRconActivity::class.java.simpleName
 
         const val EXTRA_ID = "com.sourceservermanager.EXTRA_ID"
         const val EXTRA_TITLE = "com.sourceservermanager.EXTRA_TITLE"
@@ -51,7 +51,7 @@ class ServerRconActivity : AppCompatActivity() {
 
     private var serverResponse: String? = null
 
-    private lateinit var adapter: RconAdapter
+    private lateinit var rconAdapter: RconAdapter
 
     private var sourceConnection: SourceRconConnection? = null
     private lateinit var rconViewModel: RconViewModel
@@ -64,7 +64,7 @@ class ServerRconActivity : AppCompatActivity() {
     // Create runnable for scrolling to bottom on scrollview
     private val scrollBottom: Runnable = Runnable {
         // Force scroll to scroll to the bottom
-        recycler_rcon_view.scrollToPosition(adapter.itemCount - 1)
+        recycler_rcon_view.scrollToPosition(rconAdapter.itemCount - 1)
     }
 
     // Create runnable for posting server response from thread
@@ -92,7 +92,7 @@ class ServerRconActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_server_rcon)
 
-        autocomplete = SettingsActivity().readSharedPrefs(this@ServerRconActivity).split(",").toTypedArray()
+        autocomplete = SettingsActivity().readSharedPrefs(this).split(",").toTypedArray()
 
         for (i in autocomplete)
             Log.d("AutoComplete", i)
@@ -117,14 +117,14 @@ class ServerRconActivity : AppCompatActivity() {
             String.format(resources.getString(R.string.title_rcon_activity), address)
         else
             String.format(resources.getString(R.string.title_rcon_activity), nickname)
-
+        
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         sendButton.setOnClickListener { buttonClicked(false) }
         sayButton.setOnClickListener { buttonClicked(true) }
 
         button_more.setOnClickListener {
-            val popup = PopupMenu(this@ServerRconActivity, it)
+            val popup = PopupMenu(this, it)
             popup.inflate(R.menu.menu_rcon_more)
 
             popup.setOnMenuItemClickListener { item: MenuItem? ->
@@ -161,29 +161,26 @@ class ServerRconActivity : AppCompatActivity() {
         //    return@setOnKeyListener false
         //}
 
-        recycler_rcon_view.layoutManager = LinearLayoutManager(this@ServerRconActivity)
-        recycler_rcon_view.setHasFixedSize(true)
+        rconAdapter = RconAdapter(this)
+        recycler_rcon_view.apply {
+            layoutManager = LinearLayoutManager(this@ServerRconActivity)
+            adapter = rconAdapter
+            setHasFixedSize(true)
+        }
 
-        adapter = RconAdapter()
-        recycler_rcon_view.adapter = adapter
-
-        rconViewModel = ViewModelProvider(this@ServerRconActivity).get(RconViewModel::class.java)
-
-        rconViewModel.getRconHistory(address!!).observe(this@ServerRconActivity, Observer<List<Rcon>> {
-            adapter.submitList(it)
-
+        rconViewModel = ViewModelProvider(this).get(RconViewModel::class.java)
+        rconViewModel.getRconHistory(address!!).observe(this, Observer<List<Rcon>> {
+            rconAdapter.submitList(it)
             scrollHandler.postDelayed(scrollBottom, 10)
         })
+    }
 
-        adapter.setOnItemLongClickListener(object : RconAdapter.OnItemLongClickListener {
-            override fun onItemLongClick(rcon: Rcon) {
-                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-                val clip: ClipData = ClipData.newPlainText(getString(R.string.clipboard_primary), rcon.rconMessage)
-                clipboard?.setPrimaryClip(clip)
+    override fun onItemLongClick(rcon: Rcon) {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        val clip: ClipData = ClipData.newPlainText(getString(R.string.clipboard_primary), rcon.rconMessage)
+        clipboard?.setPrimaryClip(clip)
 
-                Toast.makeText(this@ServerRconActivity, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
-            }
-        })
+        Toast.makeText(this, getString(R.string.toast_message_copied), Toast.LENGTH_SHORT).show()
     }
 
     override fun onPause() {
@@ -210,40 +207,33 @@ class ServerRconActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.action_chat -> {
                 //Go to the Chat Activity, powered by CheckValve
-                val intent = Intent(baseContext, ChatActivity::class.java)
-                intent.putExtra(ChatActivity.EXTRA_ID, id)
-                intent.putExtra(ChatActivity.EXTRA_TITLE, nickname)
-                intent.putExtra(ChatActivity.EXTRA_IP, address)
-                intent.putExtra(ChatActivity.EXTRA_PORT, port)
-                intent.putExtra(ChatActivity.EXTRA_PASSWORD, password)
-                intent.putExtra(ChatActivity.EXTRA_ISGOLDSOURCE, isGoldSource)
-                intent.putExtra(ChatActivity.EXTRA_CV_PORT, checkValvePort)
-                intent.putExtra(ChatActivity.EXTRA_CV_PASSWORD, checkValvePassword)
+                val intent = Intent(baseContext, ChatActivity::class.java).apply {
+                    putExtra(ChatActivity.EXTRA_ID, id)
+                    putExtra(ChatActivity.EXTRA_TITLE, nickname)
+                    putExtra(ChatActivity.EXTRA_IP, address)
+                    putExtra(ChatActivity.EXTRA_PORT, port)
+                    putExtra(ChatActivity.EXTRA_PASSWORD, password)
+                    putExtra(ChatActivity.EXTRA_ISGOLDSOURCE, isGoldSource)
+                    putExtra(ChatActivity.EXTRA_CV_PORT, checkValvePort)
+                    putExtra(ChatActivity.EXTRA_CV_PASSWORD, checkValvePassword)
+                }
                 startActivity(intent)
             }
             R.id.action_clear_log -> {
                 //Clear the RCON log
-                val builder = AlertDialog.Builder(this@ServerRconActivity)
-                        .setTitle(getString(R.string.dialog_delete_rcon))
-                        .setMessage(getString(R.string.dialog_delete_rcon_message))
-                        .setPositiveButton(
-                                resources.getString(R.string.dialog_delete_delete)) { _, _ ->
-                            rconViewModel.deleteRconHistory(address!!)
-                        }
-                        .setNegativeButton(
-                                resources.getString(R.string.dialog_delete_cancel)) { _, _ ->
-
-                        }
-
-                val dialog = builder.create()
-                dialog.show()
-
+                AlertDialog.Builder(this).apply {
+                    setTitle(getString(R.string.dialog_delete_rcon))
+                    setMessage(getString(R.string.dialog_delete_rcon_message))
+                    setPositiveButton(getString(R.string.dialog_delete_delete)) { _, _ ->
+                        rconViewModel.deleteRconHistory(address!!)
+                    }
+                    setNegativeButton(getString(R.string.dialog_delete_cancel)) { _, _ -> }
+                }.show()
             }
             else -> return super.onOptionsItemSelected(item)
         }
         return true
     }
-
 
     private fun buttonClicked(isSay: Boolean) {
         threadRconRequest(isSay, arrayOf(rconCommand.text.toString()))
@@ -302,6 +292,7 @@ class ServerRconActivity : AppCompatActivity() {
 
     private fun getTime(): String {
         val sdf = SimpleDateFormat("MM/dd/yyyy - HH:mm:ss", Locale.ENGLISH)
-        return sdf.format(Date()).toString()
+        val date = Date()
+        return sdf.format(date).toString()
     }
 }

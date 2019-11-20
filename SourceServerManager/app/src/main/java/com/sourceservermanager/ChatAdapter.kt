@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sourceservermanager.data.Chat
 import kotlinx.android.synthetic.main.card_view_chat.view.*
 
-class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
+class ChatAdapter(
+        private val longListener: OnItemLongClickListener
+) : ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Chat>() {
@@ -28,8 +30,6 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
         }
     }
 
-    private var listener: OnItemLongClickListener? = null
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatHolder {
         val itemView: View = LayoutInflater.from((parent.context)).inflate(R.layout.card_view_chat, parent, false)
         return ChatHolder(itemView)
@@ -37,46 +37,33 @@ class ChatAdapter: ListAdapter<Chat, ChatAdapter.ChatHolder>(DIFF_CALLBACK) {
 
     override fun onBindViewHolder(holder: ChatHolder, position: Int) {
         val currentChat: Chat = getItem(position)
-
-        holder.chatViewTimeStamp.text = currentChat.messageTimestamp
-        holder.chatViewMessage.text = currentChat.message
-        holder.chatTeam.text = ": "
-        holder.chatWho.text = currentChat.playerName
-
-        //Log.d("ChatAdapter", "protocolVersion >" + currentChat.protocolVersion.toString())
-        //Log.d("ChatAdapter", "sayTeamFlag >" + currentChat.sayTeamFlag)
-        //Log.d("ChatAdapter", "serverTimestamp >" + currentChat.serverTimestamp)
-        //Log.d("ChatAdapter", "gameServerIP >" + currentChat.gameServerIP)
-        //Log.d("ChatAdapter", "gameServerPort >" + currentChat.gameServerPort)
-        //Log.d("ChatAdapter", "messageTimestamp >" + currentChat.messageTimestamp)
-        //Log.d("ChatAdapter", "playerName >" + currentChat.playerName)
-        //Log.d("ChatAdapter", "playerTeam >" + currentChat.playerTeam)
-        //Log.d("ChatAdapter", "message >" + currentChat.message)
+        holder.bind(currentChat, longListener)
     }
 
     inner class ChatHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        init {
+        private var chatViewTimeStamp: TextView = itemView.chat_card_time
+        private var chatViewMessage: TextView = itemView.chat_card_message
+        private var chatTeam: TextView = itemView.chat_card_team
+        private var chatWho: TextView = itemView.chat_card_who
+
+        fun bind(
+                chat: Chat,
+                longListener: OnItemLongClickListener
+        ) {
+            chatViewTimeStamp.text = chat.messageTimestamp
+            chatViewMessage.text = chat.message
+            chatTeam.text = ": "
+            chatWho.text = chat.playerName
+
             itemView.setOnLongClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    listener?.onItemLongClick(getItem(position))
-                }
+                longListener.onItemLongClick(chat)
                 true
             }
-        }
 
-        val chatViewTimeStamp: TextView = itemView.chat_card_time
-        val chatViewMessage: TextView = itemView.chat_card_message
-        val chatTeam: TextView = itemView.chat_card_team
-        val chatWho: TextView = itemView.chat_card_who
+        }
     }
 
     interface OnItemLongClickListener {
         fun onItemLongClick(chat: Chat)
     }
-
-    fun setOnItemLongClickListener(listener: OnItemLongClickListener) {
-        this.listener = listener
-    }
-
 }
